@@ -7,9 +7,6 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="/assets/css/base.css">
   <link href="/css/output.css" rel="stylesheet">
-
-
-  
 </head>
 <body class="bg-gray-50 text-slate-800">
 
@@ -65,7 +62,12 @@
             <h2 class="text-xl font-semibold">Alumnos del curso</h2>
             <p id="alumnosResumen" class="text-sm text-gray-500">Listado de alumnos asociados al curso seleccionado.</p>
           </div>
-          <span id="alumnosCount" class="inline-flex w-fit items-center rounded-full bg-slate-100 px-3 py-1 text-sm font-medium text-slate-600">0 alumnos</span>
+          <div class="flex items-center gap-2">
+            <span id="alumnosCount" class="inline-flex w-fit items-center rounded-full bg-slate-100 px-3 py-1 text-sm font-medium text-slate-600">0 alumnos</span>
+            <button id="btnAsignarAlumnos" class="bg-green-600 hover:bg-green-700 text-white px-3 py-2 rounded-lg text-sm">
+              Asignar alumnos
+            </button>
+          </div>
         </div>
 
         <p id="alumnosEstado" class="mt-4 rounded-lg border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-600">Cargando alumnos...</p>
@@ -177,23 +179,15 @@
                 <option value="Auxiliar">Auxiliar</option>
               </select>
             </div>
-            <button
-              type="button"
-              id="btnAgregarSegundoProfesor"
-              class="inline-flex items-center justify-center rounded-md border border-blue-200 px-3 py-2 text-sm font-medium text-blue-700 hover:bg-blue-50"
-            >
+            <button type="button" id="btnAgregarSegundoProfesor"
+              class="inline-flex items-center justify-center rounded-md border border-blue-200 px-3 py-2 text-sm font-medium text-blue-700 hover:bg-blue-50">
               Agregar segundo profesor
             </button>
             <div id="bloqueProfesor2" class="hidden space-y-2 rounded-lg border border-slate-200 p-3">
               <div class="flex items-center justify-between gap-2">
                 <label for="materiaProfesor2" class="text-sm text-gray-600">Profesor 2</label>
-                <button
-                  type="button"
-                  id="btnQuitarSegundoProfesor"
-                  class="text-xs font-medium text-red-600 hover:text-red-700"
-                >
-                  Quitar
-                </button>
+                <button type="button" id="btnQuitarSegundoProfesor"
+                  class="text-xs font-medium text-red-600 hover:text-red-700">Quitar</button>
               </div>
               <select id="materiaProfesor2" class="w-full border rounded-md px-3 py-2"></select>
               <label for="materiaRol2" class="text-sm text-gray-600">Rol</label>
@@ -210,6 +204,71 @@
           <button type="submit" class="px-3 py-2 rounded-md bg-blue-600 text-white">Guardar</button>
         </div>
       </form>
+    </div>
+  </div>
+
+  <!-- Modal asignar alumnos -->
+  <div id="modalAsignarAlumnos" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/40 p-4">
+    <div class="w-full max-w-2xl rounded-xl bg-white shadow-lg flex flex-col max-h-[90vh]">
+
+      <!-- Header -->
+      <div class="flex items-center justify-between p-6 border-b flex-shrink-0">
+        <h3 class="text-lg font-semibold">Asignar alumnos al curso</h3>
+        <button id="btnCerrarAsignarAlumnos" class="text-gray-400 hover:text-gray-600 text-2xl font-bold leading-none">&times;</button>
+      </div>
+
+      <!-- Tabs -->
+      <div class="flex border-b px-6 flex-shrink-0">
+        <button id="tabManual" class="px-4 py-3 text-sm font-medium border-b-2 border-blue-600 text-blue-600 -mb-px" data-tab="manual">
+          Manual
+        </button>
+        <button id="tabMasiva" class="px-4 py-3 text-sm font-medium border-b-2 border-transparent text-gray-500 hover:text-gray-700 -mb-px" data-tab="masiva">
+          Masiva
+        </button>
+      </div>
+
+      <!-- Panel Manual -->
+      <div id="panelManual" class="p-6 flex flex-col gap-4 overflow-y-auto">
+        <p class="text-sm text-gray-600">Buscá un alumno por nombre, apellido, DNI o legajo. Solo se muestran alumnos sin curso asignado.</p>
+        <div class="flex gap-2">
+          <input id="inputBuscarAlumno" type="text" placeholder="Nombre, apellido, DNI o legajo..."
+            class="flex-1 border rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-300">
+          <button id="btnBuscarAlumno" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm font-medium">
+            Buscar
+          </button>
+        </div>
+        <div id="resultadosBusqueda" class="space-y-2"></div>
+        <div id="feedbackManual" class="hidden rounded-lg px-4 py-3 text-sm"></div>
+      </div>
+
+      <!-- Panel Masiva -->
+      <div id="panelMasiva" class="hidden p-6 flex flex-col gap-4 overflow-y-auto">
+        <p class="text-sm text-gray-600">Seleccioná los alumnos que querés asignar a este curso. Solo se muestran alumnos sin curso asignado.</p>
+
+        <div class="flex items-center justify-between">
+          <label class="flex items-center gap-2 text-sm font-medium cursor-pointer select-none">
+            <input id="checkTodos" type="checkbox" class="w-4 h-4 cursor-pointer">
+            Seleccionar todos
+          </label>
+          <span id="countSeleccionados" class="text-sm text-gray-500">0 seleccionados</span>
+        </div>
+
+        <div id="estadoMasiva" class="rounded-lg border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-600">
+          Cargando alumnos...
+        </div>
+
+        <div id="listaMasivaWrapper" class="hidden overflow-y-auto max-h-64 border rounded-lg divide-y"></div>
+
+        <div id="feedbackMasiva" class="hidden rounded-lg px-4 py-3 text-sm"></div>
+
+        <div class="flex justify-end pt-2 flex-shrink-0">
+          <button id="btnAsignarMasivo" disabled
+            class="bg-green-600 hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed text-white px-4 py-2 rounded-md text-sm font-medium transition">
+            Asignar seleccionados (0)
+          </button>
+        </div>
+      </div>
+
     </div>
   </div>
 

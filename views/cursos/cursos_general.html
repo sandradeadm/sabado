@@ -1,277 +1,444 @@
-<html lang="en">
-
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-    <!-- tailwind -->
+    <title>Gestión de Cursos</title>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <link rel="stylesheet" href="/assets/css/modal1.css">
     <link rel="stylesheet" href="/assets/css/base.css">
     <link rel="stylesheet" href="/assets/css/btn.css">
-  <link href="/css/output.css" rel="stylesheet">
-
-
+    <link href="/css/output.css" rel="stylesheet">
 </head>
-
 <body>
 
-    <!-- Sprite oculto -->
     <div id="svg-sprite" style="display:none"></div>
 
     <div class="min-h-screen bg-gray-50">
         <div class="space-y-6">
             <div class="bg-white rounded-lg shadow-sm border p-6">
                 <h1 class="text-2xl font-bold text-gray-900 mb-2">Gestión de Cursos</h1>
-                <p class="text-gray-600">Creación de cursos, asignación de alumnos y gestión de cupos
-                    disponibles.</p>
+                <p class="text-gray-600">Creación de cursos, asignación de alumnos y gestión de cupos disponibles.</p>
             </div>
+
             <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
-                <div
-                    class="rounded-lg border bg-card text-card-foreground shadow-sm hover:shadow-md transition-shadow cursor-pointer">
+                <!-- Crear Curso -->
+                <div class="rounded-lg border bg-card text-card-foreground shadow-sm hover:shadow-md transition-shadow cursor-pointer">
                     <div class="p-6 text-center">
-                        <button onclick="mostrarModal(document.getElementById('modalCrearCurso'))" class="w-full">
-                        <svg class="superDuperIcono rojo mx-auto">
-                            <use xlink:href="#plus"></use>
-                        </svg>
-                        <h3 class="font-semibold text-gray-900 mb-2">Crear Curso</h3>
-                        <p class="text-sm text-gray-600">Nuevo curso vinculado a plan de estudios</p>
-                    </div>
-                </div>
-                <div
-                    class="rounded-lg border bg-card text-card-foreground shadow-sm hover:shadow-md transition-shadow cursor-pointer">
-                    <div class="p-6 text-center">
-                        <button onclick="mostrarModal(document.getElementById('buscadorCurso'))" class="w-full">
-                        <svg class="superDuperIcono rojo mx-auto">
-                            <use xlink:href="#search"></use>
-                        </svg>
-                        <h3 class="font-semibold text-gray-900 mb-2">Ver curso especifico</h3>
-                        <p class="text-sm text-gray-600">Listar alumnos de un curso</p>
+                        <button id="btnAbrirCrearCurso" class="w-full">
+                            <svg class="superDuperIcono rojo mx-auto"><use xlink:href="#plus"></use></svg>
+                            <h3 class="font-semibold text-gray-900 mb-2">Crear Curso</h3>
+                            <p class="text-sm text-gray-600">Nuevo curso vinculado a plan de estudios</p>
                         </button>
                     </div>
                 </div>
-                <div
-                    class="rounded-lg border bg-card text-card-foreground shadow-sm hover:shadow-md transition-shadow cursor-pointer">
+
+                <!-- Ver curso específico -->
+                <div class="rounded-lg border bg-card text-card-foreground shadow-sm hover:shadow-md transition-shadow cursor-pointer">
                     <div class="p-6 text-center">
-                        <svg class="superDuperIcono rojo mx-auto">
-                            <use xlink:href="#users-outline"></use>
-                        </svg>
-                        <h3 class="font-semibold text-gray-900 mb-2">Asignar Alumnos</h3>
-                        <p class="text-sm text-gray-600">Vincular estudiantes según cupos</p>
+                        <button id="btnAbrirBuscadorCurso" class="w-full">
+                            <svg class="superDuperIcono rojo mx-auto"><use xlink:href="#search"></use></svg>
+                            <h3 class="font-semibold text-gray-900 mb-2">Ver curso especifico</h3>
+                            <p class="text-sm text-gray-600">Listar alumnos de un curso</p>
+                        </button>
                     </div>
                 </div>
-                <div
-                    class="rounded-lg border bg-card text-card-foreground shadow-sm hover:shadow-md transition-shadow cursor-pointer">
+
+                <!-- Asignar Alumnos -->
+                <div class="rounded-lg border bg-card text-card-foreground shadow-sm hover:shadow-md transition-shadow cursor-pointer">
                     <div class="p-6 text-center">
-                        <svg class="superDuperIcono rojo mx-auto">
-                            <use xlink:href="#random"></use>
-                        </svg>
+                        <button id="btnAbrirAsignarAlumnos" class="w-full">
+                            <svg class="superDuperIcono rojo mx-auto"><use xlink:href="#users-outline"></use></svg>
+                            <h3 class="font-semibold text-gray-900 mb-2">Asignar Alumnos</h3>
+                            <p class="text-sm text-gray-600">Vincular estudiantes según cupos</p>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Sorteo Automático -->
+                <div class="rounded-lg border bg-card text-card-foreground shadow-sm hover:shadow-md transition-shadow cursor-pointer">
+                    <div class="p-6 text-center">
+                        <svg class="superDuperIcono rojo mx-auto"><use xlink:href="#random"></use></svg>
                         <h3 class="font-semibold text-gray-900 mb-2">Sorteo Automático</h3>
                         <p class="text-sm text-gray-600">Cuando no hay cupos disponibles</p>
                     </div>
                 </div>
             </div>
-          
-    </div>
-     <div class="rounded-lg border bg-card text-card-foreground shadow-sm w-full">
-                <div class="flex flex-col space-y-1.5 p-6">
-                    <h3 class="tracking-tight text-lg font-semibold text-gray-800">Lista de cursos</h3>
+        </div>
+
+        <!-- Tabla de cursos -->
+        <div class="rounded-lg border bg-card text-card-foreground shadow-sm w-full mt-6">
+            <div class="flex flex-col space-y-1.5 p-6">
+                <h3 class="tracking-tight text-lg font-semibold text-gray-800">Lista de cursos</h3>
+            </div>
+            <div class="p-6 pt-0">
+                <div class="overflow-x-auto">
+                    <table id="tabla-cursos" class="w-full table-auto">
+                        <thead>
+                            <tr class="bg-gradient-to-r from-blue-600 to-blue-700 text-white cursor-default">
+                                <th class="px-4 py-3 text-left font-medium">ID</th>
+                                <th class="px-4 py-3 text-left font-medium">Año</th>
+                                <th class="px-4 py-3 text-left font-medium">Division</th>
+                                <th class="px-4 py-3 text-left font-medium">Nombre del plan</th>
+                                <th class="px-4 py-3 text-left font-medium">Año lectivo</th>
+                                <th class="px-4 py-3 text-center font-medium">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-200"></tbody>
+                    </table>
                 </div>
-                <div class="p-6 pt-0">
-                    <div class="overflow-x-auto">
-                       <table id="tabla-cursos" class="w-full table-auto">
-                           <thead>
-                               <tr class="bg-gradient-to-r from-blue-600 to-blue-700 text-white cursor-default">
-                                 <th class="px-4 py-3 text-left font-medium">ID</th>
-                                 <th class="px-4 py-3 text-left font-medium">Año</th>
-                                 <th class="px-4 py-3 text-left font-medium">Division</th>
-                                 <th class="px-4 py-3 text-left font-medium">Nombre del plan</th>
-                                 <th class="px-4 py-3 text-left font-medium">Año lectivo</th>
-                                 <th class="px-4 py-3 text-center font-medium">Acciones</th>
-                               </tr>
-                            </thead>
-                            <tbody class="divide-y divide-gray-200">
-                                <!-- Aquí se cargan los cursos desde cursos.js -->
-                              </tbody>
-                            </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal detalle de curso -->
+    <div id="modalDetalleCurso" class="modal">
+        <div class="modal-content">
+            <div class="container-inscripcion">
+                <span class="close-btn" onclick="cerrarModalPorId('modalDetalleCurso')">&times;</span>
+                <h2>Detalle del curso</h2>
+                <div id="cursoError" class="hidden mb-4 rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700">No se pudo cargar el curso.</div>
+                <div id="cursoSkeleton" class="animate-pulse space-y-6">
+                    <div class="bg-white shadow rounded-xl p-6 space-y-3">
+                        <div class="h-6 w-1/3 rounded bg-gray-200"></div>
+                        <div class="h-4 w-1/4 rounded bg-gray-200"></div>
+                        <div class="pt-2 space-y-2">
+                            <div class="h-4 w-1/5 rounded bg-gray-200"></div>
+                            <div class="h-5 w-1/4 rounded bg-gray-200"></div>
+                            <div class="h-4 w-2/3 rounded bg-gray-200"></div>
+                        </div>
+                    </div>
+                    <div class="space-y-3">
+                        <div class="h-5 w-32 rounded bg-gray-200"></div>
+                        <div class="grid md:grid-cols-2 gap-4">
+                            <div class="h-24 rounded-lg bg-gray-200"></div>
+                            <div class="h-24 rounded-lg bg-gray-200"></div>
+                        </div>
+                    </div>
+                </div>
+                <div id="cursoContenido" class="hidden">
+                    <div class="max-w-5xl mx-auto p-6 space-y-6">
+                        <div class="bg-white shadow rounded-xl p-6">
+                            <h1 class="text-2xl font-bold" id="cursoTitulo"></h1>
+                            <p class="text-gray-500 mt-1" id="anioLectivo"></p>
+                            <div class="mt-4">
+                                <p class="font-semibold text-gray-700">Plan de estudio</p>
+                                <p id="nombrePlan" class="text-lg"></p>
+                                <p id="descripcionPlan" class="text-gray-600 text-sm"></p>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
+                                <h2 class="text-xl font-semibold">Materias</h2>
+                                <div class="flex items-center gap-2">
+                                    <label for="ordenMaterias" class="text-sm text-gray-600">Ordenar por</label>
+                                    <select id="ordenMaterias" class="border rounded-md px-2 py-1 text-sm">
+                                        <option value="nombre">Alfabético</option>
+                                        <option value="profesor">Profesor</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <p id="materiasEmpty" class="text-gray-500 hidden">Este curso todavía no tiene materias asignadas.</p>
+                            <div id="listaMaterias" class="grid md:grid-cols-2 gap-4"></div>
+                        </div>
                     </div>
                 </div>
             </div>
-
-
-     <!-- modal para buscar alumno -->
-  <div id="buscadorCurso" class="modal">
-   <div class="modal-content">
-    <div class="container-inscripcion">
-        <span class="close-btn" onclick="cerrarModalPorId('buscadorCurso')">&times;</span>
-      <h2>Buscar Curso especifico</h2>
-        <div class="grid-campos">
-  <input type="number" id="inputAnio" maxlength="4" placeholder="Ingrese año lectivo">
-
-  <select id="selectCursoAnio">
-    <option value="">Seleccione año</option>
-    <option value="1°">1°</option>
-    <option value="2°">2°</option>
-    <option value="3°">3°</option>
-    <option value="4°">4°</option>
-    <option value="5°">5°</option>
-    <option value="6°">6°</option>
-    <option value="7°">7°</option>
-  </select>
-
-  <select id="selectCursoDivision">
-   <option value="">Seleccione división</option>
-            <option value="1°">1°</option>
-            <option value="2°">2°</option>
-            <option value="3°">3°</option>
-            <option value="4°">4°</option>
-  </select>
-
-  <input type="hidden" id="inputCurso"> <!-- Este se llenará automáticamente -->
-  
-</div>
-     <div class="form-actions">
-        <button id="btnBuscarCurso">Buscar</button>
+        </div>
     </div>
-    <div id="resultadosAlumnos" class="tabla-resultados"></div>
-</div>
-   </div>
-  </div>
 
-<div id="modalResultados" class="modal">
-  <div class="modal-content">
-        <div class="container-inscripcion">
-    <span class="close-btn" onclick="cerrarModalPorId('modalResultados')">&times;</span>
-    <h2>Resultados de la búsqueda</h2>
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <!-- NUEVO: Modal crear curso — estilo Tailwind              -->
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <div id="modalCrearCurso" class="fixed inset-0 z-50 hidden items-center justify-center bg-black bg-opacity-50 p-4">
+        <div class="w-full max-w-lg rounded-2xl bg-white shadow-xl flex flex-col">
 
-    <div id="contenidoResultados"></div>
-      </div>
-
-  </div>
-</div>
-
-<!-- Modal detalle de curso -->
-<div id="modalDetalleCurso" class="modal">
-  <div class="modal-content">
-    <div class="container-inscripcion">
-      <span class="close-btn" onclick="cerrarModalPorId('modalDetalleCurso')">&times;</span>
-      <h2>Detalle del curso</h2>
-
-      <div id="cursoError" class="hidden mb-4 rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700">
-        No se pudo cargar el curso.
-      </div>
-
-      <div id="cursoSkeleton" class="animate-pulse space-y-6">
-        <div class="bg-white shadow rounded-xl p-6 space-y-3">
-          <div class="h-6 w-1/3 rounded bg-gray-200"></div>
-          <div class="h-4 w-1/4 rounded bg-gray-200"></div>
-          <div class="pt-2 space-y-2">
-            <div class="h-4 w-1/5 rounded bg-gray-200"></div>
-            <div class="h-5 w-1/4 rounded bg-gray-200"></div>
-            <div class="h-4 w-2/3 rounded bg-gray-200"></div>
-          </div>
-        </div>
-        <div class="space-y-3">
-          <div class="h-5 w-32 rounded bg-gray-200"></div>
-          <div class="grid md:grid-cols-2 gap-4">
-            <div class="h-24 rounded-lg bg-gray-200"></div>
-            <div class="h-24 rounded-lg bg-gray-200"></div>
-            <div class="h-24 rounded-lg bg-gray-200"></div>
-            <div class="h-24 rounded-lg bg-gray-200"></div>
-          </div>
-        </div>
-      </div>
-
-      <div id="cursoContenido" class="hidden">
-        <div class="max-w-5xl mx-auto p-6 space-y-6">
-          <div class="bg-white shadow rounded-xl p-6">
-            <h1 class="text-2xl font-bold" id="cursoTitulo"></h1>
-            <p class="text-gray-500 mt-1" id="anioLectivo"></p>
-
-            <div class="mt-4">
-              <p class="font-semibold text-gray-700">Plan de estudio</p>
-              <p id="nombrePlan" class="text-lg"></p>
-              <p id="descripcionPlan" class="text-gray-600 text-sm"></p>
-            </div>
-          </div>
-
-          <div>
-            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
-              <h2 class="text-xl font-semibold">Materias</h2>
-              <div class="flex items-center gap-2">
-                <label for="ordenMaterias" class="text-sm text-gray-600">Ordenar por</label>
-                <select id="ordenMaterias" class="border rounded-md px-2 py-1 text-sm">
-                  <option value="nombre">Alfabético</option>
-                  <option value="profesor">Profesor</option>
-                </select>
-              </div>
+            <!-- Header -->
+            <div class="flex items-start justify-between p-6 border-b">
+                <div>
+                    <h3 class="text-xl font-bold text-gray-900">Crear curso</h3>
+                    <p class="text-sm text-gray-500 mt-0.5">Completá los datos para registrar un nuevo curso</p>
+                </div>
+                <button id="btnCerrarCrearCurso"
+                    class="text-gray-300 hover:text-gray-500 transition rounded-lg p-1 hover:bg-gray-100 flex-shrink-0">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"/>
+                    </svg>
+                </button>
             </div>
 
-            <p id="materiasEmpty" class="text-gray-500 hidden">Este curso todavía no tiene materias asignadas.</p>
-            <div id="listaMaterias" class="grid md:grid-cols-2 gap-4"></div>
-          </div>
+            <!-- Formulario -->
+            <form id="formCurso" class="p-6 flex flex-col gap-5">
+                <input type="hidden" name="id_curso" />
+
+                <!-- Fila: Año + División -->
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="flex flex-col gap-1.5">
+                        <label class="text-sm font-medium text-gray-700">
+                            Año
+                            <span class="text-red-500 ml-0.5">*</span>
+                        </label>
+                        <div class="relative">
+                            <select name="anio" id="selectAnio" required
+                                class="w-full appearance-none border border-gray-200 rounded-xl px-3 py-2.5 text-sm text-gray-700 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-300 focus:border-transparent focus:bg-white transition">
+                                <option value="">Seleccione año</option>
+                                <option value="1°">1°</option>
+                                <option value="2°">2°</option>
+                                <option value="3°">3°</option>
+                                <option value="4°">4°</option>
+                                <option value="5°">5°</option>
+                                <option value="6°">6°</option>
+                                <option value="7°">7°</option>
+                            </select>
+                            <svg class="pointer-events-none absolute right-3 top-1/2 h-4 w-4 text-gray-400" style="transform:translateY(-50%)" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"/>
+                            </svg>
+                        </div>
+                    </div>
+
+                    <div class="flex flex-col gap-1.5">
+                        <label class="text-sm font-medium text-gray-700">
+                            División
+                            <span class="text-red-500 ml-0.5">*</span>
+                        </label>
+                        <div class="relative">
+                            <select name="division" id="selectDivision" required
+                                class="w-full appearance-none border border-gray-200 rounded-xl px-3 py-2.5 text-sm text-gray-700 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-300 focus:border-transparent focus:bg-white transition">
+                                <option value="">Seleccione división</option>
+                                <option value="1°">1°</option>
+                                <option value="2°">2°</option>
+                                <option value="3°">3°</option>
+                                <option value="4°">4°</option>
+                            </select>
+                            <svg class="pointer-events-none absolute right-3 top-1/2 h-4 w-4 text-gray-400" style="transform:translateY(-50%)" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"/>
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Año lectivo -->
+                <div class="flex flex-col gap-1.5">
+                    <label class="text-sm font-medium text-gray-700">
+                        Año lectivo
+                        <span class="text-red-500 ml-0.5">*</span>
+                    </label>
+                    <div class="relative">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="pointer-events-none absolute left-3 top-1/2 h-4 w-4 text-gray-400" style="transform:translateY(-50%)" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                        </svg>
+                        <input type="number" name="anio_lectivo" placeholder="Ej: 2026" required
+                            class="w-full border border-gray-200 rounded-xl pl-9 pr-4 py-2.5 text-sm text-gray-700 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-300 focus:border-transparent focus:bg-white transition">
+                    </div>
+                </div>
+
+                <!-- Plan de estudio -->
+                <div class="flex flex-col gap-1.5">
+                    <label class="text-sm font-medium text-gray-700">
+                        Plan de estudio
+                        <span class="text-red-500 ml-0.5">*</span>
+                    </label>
+                    <div class="relative">
+                        <select name="id_plan" id="selectPlanes" required
+                            class="w-full appearance-none border border-gray-200 rounded-xl px-3 py-2.5 text-sm text-gray-700 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-300 focus:border-transparent focus:bg-white transition">
+                            <option value="">Seleccione un plan</option>
+                        </select>
+                        <svg class="pointer-events-none absolute right-3 top-1/2 h-4 w-4 text-gray-400" style="transform:translateY(-50%)" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"/>
+                        </svg>
+                    </div>
+                </div>
+
+                <!-- Feedback -->
+                <div id="feedbackCrearCurso" class="hidden rounded-xl px-4 py-3 text-sm border"></div>
+
+                <!-- Botones -->
+                <div class="flex items-center justify-end gap-3 pt-1">
+                    <button type="button" id="btnCancelarCrearCurso"
+                        class="px-4 py-2.5 rounded-xl border border-gray-200 text-sm font-medium text-gray-600 hover:bg-gray-50 transition">
+                        Cancelar
+                    </button>
+                    <button type="submit" id="btnSubmitCrearCurso"
+                        class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold transition">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd"/>
+                        </svg>
+                        Crear Curso
+                    </button>
+                </div>
+            </form>
         </div>
-      </div>
     </div>
-  </div>
-</div>
 
-<!-- Modal -->
-<div id="modalCrearCurso" class="modal">
-  <div class="modal-content">
-    <div class="container-inscripcion">
-      <span class="close-btn" onclick="cerrarModalPorId('modalCrearCurso')">&times;</span>
-      <h2>Crear curso</h2>
-      <form id="formCurso">
-  <input type="hidden" name="id_curso" />
-  
-  <label>Año:</label>
-  <select name="anio" id="selectAnio" required>
-    <option value="">Seleccione año</option>
-    <option value="1°">1°</option>
-    <option value="2°">2°</option>
-    <option value="3°">3°</option>
-    <option value="4°">4°</option>
-    <option value="5°">5°</option>
-    <option value="6°">6°</option>
-    <option value="7°">7°</option>
-  </select>
-
-  <label>División:</label>
-  <select name="division" id="selectDivision" required>
-    <option value="">Seleccione división</option>
-    <option value="1°">1°</option>
-    <option value="2°">2°</option>
-    <option value="3°">3°</option>
-    <option value="4°">4°</option>
-  </select>
-
-  <label>Año lectivo:</label>
-  <input type="number" name="anio_lectivo" required>
-
-  <label>Plan de estudio:</label>
-  <select name="id_plan" id="selectPlanes" required>
-    <option value="">Seleccione un plan</option>
-  </select>
-
-  <button type="submit">Crear Curso</button>
-</form>
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <!-- Modal buscador de cursos                               -->
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <div id="modalBuscadorCurso" class="fixed inset-0 z-50 hidden items-center justify-center bg-black bg-opacity-50 p-4">
+        <div class="w-full max-w-2xl rounded-2xl bg-white shadow-xl flex flex-col" style="max-height:85vh;">
+            <div class="p-6 border-b flex-shrink-0">
+                <div class="flex items-start justify-between">
+                    <div>
+                        <h3 class="text-xl font-bold text-gray-900">Buscar curso</h3>
+                        <p class="text-sm text-gray-500 mt-0.5">Filtrá por año, división, plan o año lectivo</p>
+                    </div>
+                    <button id="btnCerrarBuscadorCurso"
+                        class="text-gray-300 hover:text-gray-500 transition rounded-lg p-1 hover:bg-gray-100">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"/>
+                        </svg>
+                    </button>
+                </div>
+                <div class="mt-4 relative">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="absolute left-3 top-1/2 h-4 w-4 text-gray-400" style="transform:translateY(-50%)" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                    </svg>
+                    <input id="inputBuscarCursoEspecifico" type="text"
+                        placeholder="Ej: 2°, División 1°, Básico, 2026..."
+                        class="w-full pl-9 pr-10 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-300 bg-gray-50">
+                    <button id="btnLimpiarBusquedaCurso"
+                        class="hidden absolute right-3 top-1/2 text-gray-400 hover:text-gray-600 transition"
+                        style="transform:translateY(-50%)">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"/>
+                        </svg>
+                    </button>
+                </div>
+                <div class="mt-3 flex flex-wrap gap-2">
+                    <button class="chip-anio px-3 py-1 rounded-full text-xs font-medium bg-slate-100 text-slate-600 hover:bg-blue-100 hover:text-blue-700 transition" data-anio="">Todos</button>
+                    <button class="chip-anio px-3 py-1 rounded-full text-xs font-medium bg-blue-50 text-blue-600 hover:bg-blue-100 hover:text-blue-700 transition" data-anio="1°">1° Año</button>
+                    <button class="chip-anio px-3 py-1 rounded-full text-xs font-medium bg-violet-50 text-violet-600 hover:bg-violet-100 hover:text-violet-700 transition" data-anio="2°">2° Año</button>
+                    <button class="chip-anio px-3 py-1 rounded-full text-xs font-medium bg-emerald-50 text-emerald-600 hover:bg-emerald-100 hover:text-emerald-700 transition" data-anio="3°">3° Año</button>
+                    <button class="chip-anio px-3 py-1 rounded-full text-xs font-medium bg-amber-50 text-amber-600 hover:bg-amber-100 hover:text-amber-700 transition" data-anio="4°">4° Año</button>
+                    <button class="chip-anio px-3 py-1 rounded-full text-xs font-medium bg-rose-50 text-rose-600 hover:bg-rose-100 hover:text-rose-700 transition" data-anio="5°">5° Año</button>
+                    <button class="chip-anio px-3 py-1 rounded-full text-xs font-medium bg-cyan-50 text-cyan-600 hover:bg-cyan-100 hover:text-cyan-700 transition" data-anio="6°">6° Año</button>
+                    <button class="chip-anio px-3 py-1 rounded-full text-xs font-medium bg-orange-50 text-orange-600 hover:bg-orange-100 hover:text-orange-700 transition" data-anio="7°">7° Año</button>
+                </div>
+            </div>
+            <div class="px-6 pt-4 pb-2 flex-shrink-0">
+                <p id="contadorResultadosBuscador" class="text-xs text-gray-400"></p>
+            </div>
+            <div class="px-6 pb-6 overflow-y-auto flex-1">
+                <div id="estadoBuscadorCurso"
+                    class="rounded-xl border border-slate-200 bg-slate-50 px-4 py-10 text-sm text-slate-500 text-center">
+                    Cargando cursos...
+                </div>
+                <div id="resultadosBuscadorCurso" class="hidden grid grid-cols-1 sm:grid-cols-2 gap-3"></div>
+            </div>
+        </div>
     </div>
-  </div>
-</div>
-<script src="/services/api.js"></script>
-<script src="/assets/js/busquedamodal.js"></script>
-<script src="/assets/js/controllers/curso/cursos_general.js"></script>
-<script src="/assets/js/modal.js"></script>
-<script src="/assets/js/js/pageAccess.js"></script>
-  <script src="/assets/js/ui.js"></script>
-<script>
-    //Cargar iconos
-    fetch('/assets/icons/iconos.svg')
-    .then(res => res.text())
-    .then(data => {
-        document.getElementById('svg-sprite').innerHTML = data;
-    });
-</script>
 
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <!-- PASO 1 — Seleccionar curso para asignar alumnos        -->
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <div id="modalSeleccionarCurso" class="fixed inset-0 z-50 hidden items-center justify-center bg-black bg-opacity-50 p-4">
+        <div class="w-full max-w-2xl rounded-2xl bg-white shadow-xl flex flex-col" style="max-height:85vh;">
+            <div class="p-6 border-b flex-shrink-0">
+                <div class="flex items-start justify-between">
+                    <div>
+                        <div class="flex items-center gap-2 mb-1">
+                            <span class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-blue-600 text-white text-xs font-bold">1</span>
+                            <span class="text-xs font-medium text-gray-400 uppercase tracking-wide">Paso 1 de 2</span>
+                        </div>
+                        <h3 class="text-xl font-bold text-gray-900">Seleccioná el curso destino</h3>
+                        <p class="text-sm text-gray-500 mt-0.5">¿A qué curso querés asignar alumnos?</p>
+                    </div>
+                    <button id="btnCerrarSeleccionarCurso"
+                        class="text-gray-300 hover:text-gray-500 transition rounded-lg p-1 hover:bg-gray-100">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"/>
+                        </svg>
+                    </button>
+                </div>
+                <div class="mt-4 relative">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="absolute left-3 top-1/2 h-4 w-4 text-gray-400" style="transform:translateY(-50%)" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                    </svg>
+                    <input id="inputFiltrarCurso" type="text"
+                        placeholder="Filtrar por año, división o año lectivo..."
+                        class="w-full pl-9 pr-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-300 bg-gray-50">
+                </div>
+            </div>
+            <div class="p-6 overflow-y-auto flex-1">
+                <div id="estadoCursosList"
+                    class="rounded-xl border border-slate-200 bg-slate-50 px-4 py-10 text-sm text-slate-500 text-center">
+                    Cargando cursos...
+                </div>
+                <p id="contadorCursosFiltrados" class="hidden text-xs text-gray-400 mb-3"></p>
+                <div id="listaCursosAsignar" class="hidden grid grid-cols-1 sm:grid-cols-2 gap-3"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <!-- PASO 2 — Asignar alumnos (Manual + Masiva)             -->
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <div id="modalAsignarAlumnosGeneral" class="fixed inset-0 z-50 hidden items-center justify-center bg-black bg-opacity-50 p-4">
+        <div class="w-full max-w-2xl rounded-xl bg-white shadow-lg flex flex-col" style="max-height:90vh;">
+            <div class="flex items-center justify-between p-6 border-b flex-shrink-0">
+                <div>
+                    <h3 class="text-lg font-semibold text-gray-900">Asignar alumnos al curso</h3>
+                    <p id="subtituloCursoAsignar" class="text-sm text-blue-600 font-medium mt-0.5"></p>
+                </div>
+                <div class="flex items-center gap-3">
+                    <button id="btnVolverSeleccionCurso"
+                        class="text-sm text-gray-500 hover:text-gray-700 border rounded-md px-3 py-1.5 hover:bg-gray-50 transition">
+                        ← Cambiar curso
+                    </button>
+                    <button id="btnCerrarAsignarGeneral"
+                        class="text-gray-300 hover:text-gray-500 transition rounded-lg p-1 hover:bg-gray-100">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"/>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+            <div class="flex border-b px-6 flex-shrink-0">
+                <button id="tabManualG" class="px-4 py-3 text-sm font-medium border-b-2 border-blue-600 text-blue-600 -mb-px">Manual</button>
+                <button id="tabMasivaG" class="px-4 py-3 text-sm font-medium border-b-2 border-transparent text-gray-500 hover:text-gray-700 -mb-px">Masiva</button>
+            </div>
+            <div id="panelManualG" class="p-6 flex flex-col gap-4 overflow-y-auto">
+                <p class="text-sm text-gray-600">Buscá un alumno por nombre, apellido, DNI o legajo. Solo se muestran alumnos sin curso asignado.</p>
+                <div class="flex gap-2">
+                    <input id="inputBuscarAlumnoG" type="text" placeholder="Nombre, apellido, DNI o legajo..."
+                        class="flex-1 border rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-300">
+                    <button id="btnBuscarAlumnoG" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm font-medium transition">Buscar</button>
+                </div>
+                <div id="resultadosBusquedaG" class="space-y-2"></div>
+                <div id="feedbackManualG" class="hidden rounded-lg px-4 py-3 text-sm"></div>
+            </div>
+            <div id="panelMasivaG" class="hidden p-6 flex flex-col gap-4 overflow-y-auto">
+                <p class="text-sm text-gray-600">Seleccioná los alumnos que querés asignar. Solo se muestran alumnos sin curso asignado.</p>
+                <div class="flex items-center justify-between">
+                    <label class="flex items-center gap-2 text-sm font-medium cursor-pointer select-none">
+                        <input id="checkTodosG" type="checkbox" class="w-4 h-4 cursor-pointer">
+                        Seleccionar todos
+                    </label>
+                    <span id="countSeleccionadosG" class="text-sm text-gray-500">0 seleccionados</span>
+                </div>
+                <div id="estadoMasivaG" class="rounded-lg border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-600">Cargando alumnos...</div>
+                <div id="listaMasivaWrapperG" class="hidden overflow-y-auto border rounded-lg divide-y" style="max-height:16rem;"></div>
+                <div id="feedbackMasivaG" class="hidden rounded-lg px-4 py-3 text-sm"></div>
+                <div class="flex justify-end pt-2 flex-shrink-0">
+                    <button id="btnAsignarMasivoG" disabled
+                        class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md text-sm font-medium transition"
+                        style="opacity:0.5;cursor:not-allowed;">
+                        Asignar seleccionados (0)
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="/services/api.js"></script>
+    <script src="/assets/js/busquedamodal.js"></script>
+    <script src="/assets/js/controllers/curso/cursos_general.js"></script>
+    <script src="/assets/js/modal.js"></script>
+    <script src="/assets/js/js/pageAccess.js"></script>
+    <script src="/assets/js/ui.js"></script>
+    <script src="/assets/js/js/log.js"></script>
+    <script>
+        fetch('/assets/icons/iconos.svg')
+            .then(res => res.text())
+            .then(data => { document.getElementById('svg-sprite').innerHTML = data; });
+    </script>
 </body>
+</html>

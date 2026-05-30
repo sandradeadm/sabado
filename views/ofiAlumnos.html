@@ -1,16 +1,15 @@
-<html lang="en">
+<html lang="es">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Manager de Alumnos</title>
     
     <link rel="stylesheet" href="/assets/css/modal1.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css">
     <link rel="stylesheet" href="/assets/css/btn.css">
     <link rel="stylesheet" href="/assets/css/base.css">
-  <link href="/css/output.css" rel="stylesheet">
-
+    <link href="/css/output.css" rel="stylesheet">
 </head>
 
 <body>
@@ -23,55 +22,36 @@
         <div class="space-y-6">
             <div class="bg-white rounded-lg shadow-sm border p-6">
                 <h1 class="text-2xl font-bold text-gray-900 mb-2">Manager de Alumnos</h1>
-                <p class="text-gray-600">Gestión completa de estudiantes: inscripciones, reinscripciones,
-                    actualización de datos y generación de pases.</p>
+                <p class="text-gray-600">Gestión completa de estudiantes: inscripciones, actualización de datos y consulta de información.</p>
             </div>
 
-            <!-- GRID CON NUEVA INSCRIPCIÓN - DESTACADA Y MÁS GRANDE -->
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              
-              <!-- NUEVA INSCRIPCIÓN - DESTACADA Y MÁS GRANDE -->
-              <button onclick="mostrarModal(document.getElementById('modalFormAlumno'))"
-               class="rounded-lg border bg-card text-card-foreground shadow-sm hover:shadow-md transition-shadow cursor-pointer w-full p-8 text-center group lg:col-span-3">
-                    <svg class="superDuperIcono text-gray-600 mx-auto group-hover:scale-110 transition-transform mb-2" style="font-size: 2.5rem;">
+            <!-- NUEVA INSCRIPCIÓN + BUSCAR O EDITAR — dos columnas iguales -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+                <button onclick="mostrarModalInscripcion()"
+                    class="rounded-lg border bg-card text-card-foreground shadow-sm hover:shadow-md transition-shadow cursor-pointer w-full p-8 text-center group">
+                    <svg class="superDuperIcono text-gray-600 mx-auto group-hover:scale-110 transition-transform mb-2">
                         <use xlink:href="#user-plus-outline"></use>
                     </svg>
                     <h3 class="font-semibold text-gray-900 mb-2 text-lg">Nueva Inscripción</h3>
                     <p class="text-sm text-gray-600">Registrar nuevo estudiante</p>
-              </button>
+                </button>
 
-            </div>
-
-            <!-- SEGUNDO GRID CON LOS OTROS DOS BOTONES -->
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-              
-              <!-- REINSCRIPCIÓN -->
-              <button onclick="mostrarModal(document.getElementById('modalReinscripcion'))"
-                class="rounded-lg border bg-card text-card-foreground shadow-sm hover:shadow-md transition-shadow cursor-pointer w-full p-6 text-center group">
-                    <svg class="superDuperIcono text-gray-600 mx-auto group-hover:scale-110 transition-transform">
-                        <use xlink:href="#arrow-roundsquare"></use>
+                <button onclick="abrirModalBuscarEditar()"
+                    class="rounded-lg border bg-card text-card-foreground shadow-sm hover:shadow-md transition-shadow cursor-pointer w-full p-8 text-center group">
+                    <svg class="superDuperIcono text-gray-600 mx-auto group-hover:scale-110 transition-transform mb-2">
+                        <use xlink:href="#pencil-square-outline"></use>
                     </svg>
-                    <h3 class="font-semibold text-gray-900 mb-2">Reinscripción</h3>
-                    <p class="text-sm text-gray-600">Actualizar inscripción anual</p>
-              </button>
-
-              <!-- BUSCAR O EDITAR - MISMO ESTILO -->
-              <button onclick="mostrarModal(document.getElementById('modalBuscarEditar'))"
-                class="rounded-lg border bg-card text-card-foreground shadow-sm hover:shadow-md transition-shadow cursor-pointer w-full p-6 text-center group">
-                <svg class="superDuperIcono text-gray-600 mx-auto group-hover:scale-110 transition-transform">
-                  <use xlink:href="#pencil-square-outline"></use>
-                </svg>
-                <h3 class="font-semibold text-gray-900 mb-2">Buscar o Editar</h3>
-                <p class="text-sm text-gray-600">Encuentra y modifica datos del alumno</p>
-              </button>
+                    <h3 class="font-semibold text-gray-900 mb-2 text-lg">Buscar o Editar</h3>
+                    <p class="text-sm text-gray-600">Encuentra y modifica datos del alumno</p>
+                </button>
 
             </div>
            
+            <!-- LISTA DE ALUMNOS -->
             <div class="max-w-4xl mx-auto mt-10">
               <div class="rounded-lg border bg-card text-card-foreground shadow-sm p-6">
                 <h3 class="tracking-tight text-lg font-semibold text-gray-800 text-center">Lista de Alumnos actuales</h3>
-                
-                <!-- Filtros centrados -->
                 <div class="flex justify-center gap-4 mt-4">
                   <select id="selectCursoAnio" class="border rounded-md px-2 py-1">
                     <option value="">Seleccione año</option>
@@ -83,7 +63,6 @@
                     <option value="6°">6°</option>
                     <option value="7°">7°</option>
                   </select>
-
                   <select id="selectCursoDivision" class="border rounded-md px-2 py-1">
                     <option value="">Seleccione división</option>
                     <option value="1°">1°</option>
@@ -115,412 +94,625 @@
         </div>
     </div>
 
-    <!-- Modal para ver más información del alumno -->
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <!-- Modal Ver Más                                           -->
+    <!-- ═══════════════════════════════════════════════════════ -->
     <div id="modalVerMas" class="modal">
       <div class="modal-content">
         <div class="container-inscripcion">
           <span class="close-btn" onclick="cerrarModalPorId('modalVerMas')">&times;</span>
-           <h2 class="text-white bg-blue-400 w-full text-center p-3 rounded-t-lg">
+          <h2 class="text-white bg-blue-400 w-full text-center p-3 rounded-t-lg">
             Detalles del alumno
           </h2>
-          <div id="detalleAlumno">
-            <!-- se rellena de datos que agarra el backend y controller lo moldea  -->
+          <div id="detalleAlumno"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <!-- Modal Nueva Inscripción — Tailwind con tabs            -->
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <div id="modalFormAlumno" class="fixed inset-0 z-50 hidden items-center justify-center bg-black bg-opacity-50 p-4">
+      <div class="w-full max-w-2xl rounded-2xl bg-white shadow-xl flex flex-col" style="max-height:90vh;">
+
+        <!-- Header -->
+        <div class="flex items-start justify-between p-6 border-b flex-shrink-0">
+          <div>
+            <h3 class="text-xl font-bold text-gray-900">Nueva Inscripción</h3>
+            <p class="text-sm text-gray-500 mt-0.5">Completá los datos del alumno y su tutor</p>
           </div>
+          <button id="btnCerrarModalInscripcion"
+            class="text-gray-300 hover:text-gray-500 transition rounded-lg p-1 hover:bg-gray-100 flex-shrink-0">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"/>
+            </svg>
+          </button>
         </div>
+
+        <!-- Tabs -->
+        <div class="flex border-b px-6 flex-shrink-0">
+          <button id="tabInscAlumno"
+            class="px-4 py-3 text-sm font-medium border-b-2 border-blue-600 text-blue-600 -mb-px flex items-center gap-2">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"/>
+            </svg>
+            Datos del Alumno
+          </button>
+          <button id="tabInscTutor"
+            class="px-4 py-3 text-sm font-medium border-b-2 border-transparent text-gray-500 hover:text-gray-700 -mb-px flex items-center gap-2">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+              <path d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v1h8v-1zM6 8a2 2 0 11-4 0 2 2 0 014 0zM16 18v-1a5.972 5.972 0 00-.75-2.906A3.005 3.005 0 0119 15v1h-3zM4.75 12.094A5.973 5.973 0 004 15v1H1v-1a3 3 0 013.75-2.906z"/>
+            </svg>
+            Datos del Tutor
+          </button>
+        </div>
+
+        <!-- Formulario -->
+        <form id="formAlumno" class="flex flex-col flex-1 overflow-hidden">
+          <input type="hidden" name="id_alumno" />
+          <input type="hidden" name="id_tutor" />
+
+          <!-- Panel Alumno -->
+          <div id="panelInscAlumno" class="p-6 overflow-y-auto flex-1">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div class="flex flex-col gap-1.5">
+                <label class="text-sm font-medium text-gray-700">Legajo <span class="text-red-500">*</span></label>
+                <input type="text" id="legajo" name="legajo" placeholder="Ej: 12345" maxlength="8" required
+                  class="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-300 focus:bg-white transition">
+              </div>
+              <div class="flex flex-col gap-1.5">
+                <label class="text-sm font-medium text-gray-700">Nombre <span class="text-red-500">*</span></label>
+                <input type="text" id="nombre" name="nombre" placeholder="Nombre" maxlength="15" required
+                  class="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-300 focus:bg-white transition">
+              </div>
+              <div class="flex flex-col gap-1.5">
+                <label class="text-sm font-medium text-gray-700">Apellido <span class="text-red-500">*</span></label>
+                <input type="text" id="apellido" name="apellido" placeholder="Apellido" maxlength="15" required
+                  class="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-300 focus:bg-white transition">
+              </div>
+              <div class="flex flex-col gap-1.5">
+                <label class="text-sm font-medium text-gray-700">DNI <span class="text-red-500">*</span></label>
+                <input type="text" id="dni" name="dni" placeholder="Ej: 44123456" maxlength="8" required
+                  class="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-300 focus:bg-white transition">
+              </div>
+              <div class="flex flex-col gap-1.5">
+                <label class="text-sm font-medium text-gray-700">CUIL <span class="text-red-500">*</span></label>
+                <input type="text" id="cuil" name="cuil" placeholder="Ej: 20441234560" maxlength="11" required
+                  class="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-300 focus:bg-white transition">
+              </div>
+              <div class="flex flex-col gap-1.5">
+                <label class="text-sm font-medium text-gray-700">Email <span class="text-red-500">*</span></label>
+                <input type="email" id="email" name="email" placeholder="email@ejemplo.com" maxlength="25" required
+                  class="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-300 focus:bg-white transition">
+              </div>
+              <div class="flex flex-col gap-1.5">
+                <label class="text-sm font-medium text-gray-700">Dirección</label>
+                <input type="text" id="direccion" name="direccion" placeholder="Dirección" maxlength="25"
+                  class="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-300 focus:bg-white transition">
+              </div>
+              <div class="flex flex-col gap-1.5">
+                <label class="text-sm font-medium text-gray-700">Fecha de Nacimiento <span class="text-red-500">*</span></label>
+                <input type="date" id="fecha_nacimiento" name="fecha_nacimiento" required
+                  class="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-300 focus:bg-white transition">
+              </div>
+              <div class="flex flex-col gap-1.5 sm:col-span-2">
+                <label class="text-sm font-medium text-gray-700">Link Documento</label>
+                <input type="text" id="link_docu" name="link_docu" placeholder="https://drive.google.com/..." maxlength="80"
+                  class="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-300 focus:bg-white transition">
+              </div>
+              <div class="flex flex-col gap-1.5 sm:col-span-2">
+                <label class="text-sm font-medium text-gray-700">¿Tiene hermanos en la institución?</label>
+                <div class="relative">
+                  <select id="hermanos" name="hermanos"
+                    class="w-full appearance-none border border-gray-200 rounded-xl px-3 py-2.5 text-sm bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-300 focus:bg-white transition">
+                    <option value="true">Sí</option>
+                    <option value="false">No</option>
+                  </select>
+                  <svg class="pointer-events-none absolute right-3 top-1/2 h-4 w-4 text-gray-400" style="transform:translateY(-50%)" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"/>
+                  </svg>
+                </div>
+              </div>
+            </div>
+            <!-- Siguiente -->
+            <div class="flex justify-end mt-6">
+              <button type="button" id="btnSiguienteTutor"
+                class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold transition">
+                Siguiente: Tutor
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                  <path fill-rule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clip-rule="evenodd"/>
+                </svg>
+              </button>
+            </div>
+          </div>
+
+          <!-- Panel Tutor -->
+          <div id="panelInscTutor" class="hidden p-6 overflow-y-auto flex-1">
+            <div class="mb-5 flex items-start gap-3 rounded-xl border border-blue-200 bg-blue-50 px-4 py-3">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-blue-500 flex-shrink-0 mt-0.5" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
+              </svg>
+              <p class="text-sm text-blue-700">Si el tutor ya existe en el sistema (por DNI), sus datos se vincularán automáticamente.</p>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div class="flex flex-col gap-1.5">
+                <label class="text-sm font-medium text-gray-700">Nombre <span class="text-red-500">*</span></label>
+                <input type="text" id="tutor_nombre" name="tutor_nombre" placeholder="Nombre del Tutor" maxlength="15" required
+                  class="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-300 focus:bg-white transition">
+              </div>
+              <div class="flex flex-col gap-1.5">
+                <label class="text-sm font-medium text-gray-700">Apellido <span class="text-red-500">*</span></label>
+                <input type="text" id="tutor_apellido" name="tutor_apellido" placeholder="Apellido del Tutor" maxlength="15" required
+                  class="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-300 focus:bg-white transition">
+              </div>
+              <div class="flex flex-col gap-1.5">
+                <label class="text-sm font-medium text-gray-700">DNI <span class="text-red-500">*</span></label>
+                <input type="text" id="tutor_dni" name="tutor_dni" placeholder="DNI del Tutor" maxlength="8" required
+                  class="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-300 focus:bg-white transition">
+              </div>
+              <div class="flex flex-col gap-1.5">
+                <label class="text-sm font-medium text-gray-700">CUIL <span class="text-red-500">*</span></label>
+                <input type="text" id="tutor_cuil" name="tutor_cuil" placeholder="CUIL del Tutor" maxlength="11" required
+                  class="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-300 focus:bg-white transition">
+              </div>
+              <div class="flex flex-col gap-1.5">
+                <label class="text-sm font-medium text-gray-700">Teléfono</label>
+                <input type="tel" id="tutor_telefono" name="tutor_telefono" placeholder="Teléfono del Tutor" maxlength="15"
+                  class="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-300 focus:bg-white transition">
+              </div>
+              <div class="flex flex-col gap-1.5">
+                <label class="text-sm font-medium text-gray-700">Email</label>
+                <input type="email" id="tutor_email" name="tutor_email" placeholder="Email del Tutor" maxlength="25"
+                  class="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-300 focus:bg-white transition">
+              </div>
+              <div class="flex flex-col gap-1.5 sm:col-span-2">
+                <label class="text-sm font-medium text-gray-700">Dirección</label>
+                <input type="text" id="tutor_direccion" name="tutor_direccion" placeholder="Dirección del Tutor" maxlength="25"
+                  class="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-300 focus:bg-white transition">
+              </div>
+            </div>
+            <!-- Feedback -->
+            <div id="feedbackInscripcion" class="hidden mt-4 rounded-xl px-4 py-3 text-sm border"></div>
+            <!-- Botones -->
+            <div class="flex items-center justify-between mt-6 gap-3">
+              <button type="button" id="btnVolverAlumno"
+                class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl border border-gray-200 text-sm font-medium text-gray-600 hover:bg-gray-50 transition">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                  <path fill-rule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clip-rule="evenodd"/>
+                </svg>
+                Volver
+              </button>
+              <div class="flex items-center gap-3">
+                <button type="button" id="btnCancelarInscripcion"
+                  class="px-4 py-2.5 rounded-xl border border-gray-200 text-sm font-medium text-gray-600 hover:bg-gray-50 transition">
+                  Cancelar
+                </button>
+                <button type="submit" id="btnSubmitInscripcion"
+                  class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-green-600 hover:bg-green-700 text-white text-sm font-semibold transition">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                  </svg>
+                  Agregar Alumno
+                </button>
+              </div>
+            </div>
+          </div>
+
+        </form>
       </div>
     </div>
 
-    <!-- Modal crear -->
-    <div id="modalFormAlumno" class="modal">
-      <div class="modal-content">
-        <div class="container-inscripcion">
-           <span class="close-btn" onclick="cerrarModalPorId('modalFormAlumno')">&times;</span>
-          <h2>Formulario de Inscripción de Alumnos</h2>
-
-          <form id="formAlumno" class="form-grid">
-            <input type="hidden" name="id_alumno" />
-            <input type="hidden" name="id_tutor" />
-
-            <!-- Sección Alumno -->
-            <fieldset>
-              <legend>Datos del Alumno</legend>
-
-              <label for="legajo">Legajo</label>
-              <input type="text" id="legajo" name="legajo" placeholder="Legajo" maxlength="8" required>
-
-              <label for="nombre">Nombre</label>
-              <input type="text" id="nombre" name="nombre" placeholder="Nombre" maxlength="15"required>
-
-              <label for="apellido">Apellido</label>
-              <input type="text" id="apellido" name="apellido" placeholder="Apellido" maxlength="15"required>
-
-              <label for="dni">DNI</label>
-              <input type="text" id="dni" name="dni" placeholder="DNI" maxlength="8" required>
-
-              <label for="cuil">CUIL</label>
-              <input type="text" id="cuil" name="cuil" placeholder="CUIL" maxlength="11" required>
-
-              <label for="email">Email</label>
-              <input type="email" id="email" name="email" placeholder="Email" maxlength="25"required>
-
-              <label for="direccion">Dirección</label>
-              <input type="text" id="direccion" name="direccion" placeholder="Dirección" maxlength="25">
-
-              <label for="link_docu">Link Documento</label>
-              <input type="text" id="link_docu" name="link_docu" placeholder="Link Documento" maxlength="80">
-
-              <label for="fecha_nacimiento">Fecha de Nacimiento</label>
-              <input type="date" id="fecha_nacimiento" name="fecha_nacimiento" required>
-
-              <label for="hermanos">¿Tiene hermanos en la institución?</label>
-              <select id="hermanos" name="hermanos">
-                <option value="true">Sí</option>
-                <option value="false">No</option>
-              </select>
-            </fieldset>
-
-            <!-- Sección Tutor -->
-            <fieldset>
-              <legend>Datos del Tutor</legend>
-
-              <label for="tutor_nombre">Nombre</label>
-              <input type="text" id="tutor_nombre" name="tutor_nombre" placeholder="Nombre del Tutor" maxlength="15" required>
-
-              <label for="tutor_apellido">Apellido</label>
-              <input type="text" id="tutor_apellido" name="tutor_apellido" placeholder="Apellido del Tutor" maxlength="15" required>
-
-              <label for="tutor_dni">DNI</label>
-              <input type="text" id="tutor_dni" name="tutor_dni"  placeholder="DNI del Tutor" maxlength="8" required>
-
-              <label for="tutor_cuil">CUIL</label>
-              <input type="text" id="tutor_cuil" name="tutor_cuil" placeholder="CUIL del Tutor" maxlength="11" required>
-
-              <label for="tutor_telefono">Teléfono</label>
-              <input type="tel" id="tutor_telefono" name="tutor_telefono" placeholder="Teléfono del Tutor" maxlength="15">
-
-              <label for="tutor_email">Email</label>
-              <input type="email" id="tutor_email" name="tutor_email" placeholder="Email del Tutor" maxlength="25">
-
-              <label for="tutor_direccion">Dirección</label>
-              <input type="text" id="tutor_direccion" name="tutor_direccion" placeholder="Dirección del Tutor" maxlength="25">
-            </fieldset>
-
-            <button type="submit">Agregar Alumno</button>
-          </form>
-        </div>
-      </div>
-    </div>
-
-    <!-- Modal para Editar Alumno -->
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <!-- Modal Editar Alumno (usado desde tabla)                 -->
+    <!-- ═══════════════════════════════════════════════════════ -->
     <div id="modalEditarAlumno" class="modal">
       <div class="modal-content">
         <div class="container-inscripcion">
           <span class="close-btn" onclick="cerrarModalPorId('modalEditarAlumno')">&times;</span>
           <h2>Editar Datos del Alumno</h2>
-
           <form id="formAlumnoEditar">
             <input type="hidden" name="id_alumno" />
             <input type="hidden" name="id_tutor" />
-
             <fieldset>
               <legend>Datos del Alumno</legend>
-
               <label for="edit_legajo">Legajo</label>
               <input type="text" id="edit_legajo" name="legajo" class="only-numbers" maxlength="8" required>
-
               <label for="edit_nombre">Nombre</label>
               <input type="text" id="edit_nombre" name="nombre" maxlength="15" required>
-
               <label for="edit_apellido">Apellido</label>
               <input type="text" id="edit_apellido" name="apellido" maxlength="15" required>
-
               <label for="edit_dni">DNI</label>
               <input type="text" id="edit_dni" name="dni" maxlength="8" required>
-
               <label for="edit_cuil">CUIL</label>
               <input type="text" id="edit_cuil" name="cuil" maxlength="11" required>
-
               <label for="edit_email">Email</label>
               <input type="email" id="edit_email" name="email" maxlength="30">
-
               <label for="edit_direccion">Dirección</label>
               <input type="text" id="edit_direccion" name="direccion" maxlength="50" required>
-
               <label for="edit_link_docu">Link Documentación</label>
               <input type="text" id="edit_link_docu" name="link_docu" maxlength="100">
-
               <label for="edit_hermanos">¿Tiene hermanos en la escuela?</label>
               <select id="edit_hermanos" name="hermanos" required>
                 <option value="false">No</option>
                 <option value="true">Sí</option>
               </select>
-
               <label for="edit_fecha_nacimiento">Fecha de nacimiento</label>
               <input type="date" id="edit_fecha_nacimiento" name="fecha_nacimiento" required>
             </fieldset>
-
             <fieldset>
               <legend>Datos del Tutor</legend>
-
               <label for="edit_tutor_nombre">Nombre</label>
-              <input type="text" id="edit_tutor_nombre" name="tutor_nombre" maxlength="15" >
-
+              <input type="text" id="edit_tutor_nombre" name="tutor_nombre" maxlength="15">
               <label for="edit_tutor_apellido">Apellido</label>
-              <input type="text" id="edit_tutor_apellido" name="tutor_apellido" maxlength="15" >
-
+              <input type="text" id="edit_tutor_apellido" name="tutor_apellido" maxlength="15">
               <label for="edit_tutor_dni">DNI</label>
               <input type="text" id="edit_tutor_dni" name="tutor_dni" maxlength="8">
-
               <label for="edit_tutor_cuil">CUIL</label>
-              <input type="text" id="edit_tutor_cuil" name="tutor_cuil" maxlength="11" >
-
+              <input type="text" id="edit_tutor_cuil" name="tutor_cuil" maxlength="11">
               <label for="edit_tutor_telefono">Teléfono</label>
               <input type="text" id="edit_tutor_telefono" name="tutor_telefono" maxlength="15">
-
               <label for="edit_tutor_email">Email</label>
               <input type="email" id="edit_tutor_email" name="tutor_email" maxlength="30">
-
               <label for="edit_tutor_direccion">Dirección</label>
               <input type="text" id="edit_tutor_direccion" name="tutor_direccion" maxlength="50">
             </fieldset>
-
             <button type="submit">Guardar Cambios</button>
           </form>
         </div>
       </div>
     </div>
 
-    <!-- Modal: Buscar o Editar Alumno -->
-    <div id="modalBuscarEditar" class="modal">
-      <div class="modal-content">
-        <div class="container-inscripcion">
-          <span class="close-btn" onclick="cerrarModalPorId('modalBuscarEditar')">&times;</span>
-          
-          <!-- TAB 1: Búsqueda -->
-          <div id="tabBusqueda" class="tab-content active">
-            <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">
-              <svg class="inline-block w-6 h-6 mr-2 text-blue-600">
-                <use xlink:href="#search"></use>
-              </svg>
-              Buscar Alumno
-            </h2>
-            
-            <div class="bg-blue-50 border-l-4 border-blue-500 p-4 mb-6 rounded">
-              <p class="text-sm text-blue-800">Busca por: <strong>DNI</strong>, <strong>Legajo</strong>, <strong>Nombre</strong>, <strong>Apellido</strong> o <strong>DNI del Tutor</strong></p>
-            </div>
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <!-- Modal Buscar o Editar — Tailwind                        -->
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <div id="modalBuscarEditar" class="fixed inset-0 z-50 hidden items-center justify-center bg-black bg-opacity-50 p-4">
+      <div class="w-full max-w-3xl rounded-2xl bg-white shadow-xl flex flex-col" style="max-height:90vh;">
 
-            <div class="mb-6">
-              <input 
-                type="text" 
-                id="inputBusquedaAlumno" 
-                placeholder="Ingresa DNI, legajo, nombre o apellido..." 
-                class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none transition"
+        <!-- Header -->
+        <div class="flex items-start justify-between p-6 border-b flex-shrink-0">
+          <div id="headerBuscarEditar">
+            <h3 class="text-xl font-bold text-gray-900">Buscar alumno</h3>
+            <p class="text-sm text-gray-500 mt-0.5">Buscá por DNI, legajo, nombre, apellido o DNI del tutor</p>
+          </div>
+          <button id="btnCerrarBuscarEditar"
+            class="text-gray-300 hover:text-gray-500 transition rounded-lg p-1 hover:bg-gray-100 flex-shrink-0">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"/>
+            </svg>
+          </button>
+        </div>
+
+        <!-- PANEL BÚSQUEDA -->
+        <div id="panelBusquedaBE" class="p-6 overflow-y-auto flex-1 flex flex-col gap-4">
+          <div class="flex gap-2">
+            <div class="relative flex-1">
+              <svg xmlns="http://www.w3.org/2000/svg" class="absolute left-3 top-1/2 h-4 w-4 text-gray-400 pointer-events-none" style="transform:translateY(-50%)" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+              </svg>
+              <input
+                type="text"
+                id="inputBusquedaAlumno"
+                placeholder="Nombre, apellido, DNI, legajo o DNI del tutor..."
+                class="w-full pl-9 pr-4 py-2.5 border border-gray-200 rounded-xl text-sm bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-300 focus:bg-white transition"
               >
             </div>
-
-            <button 
-              id="btnBuscarAlumnoModal" 
-              class="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-semibold py-3 rounded-lg transition transform hover:scale-105"
-            >
-              <svg class="inline-block w-5 h-5 mr-2">
-                <use xlink:href="#search"></use>
-              </svg>
+            <button id="btnBuscarAlumnoModal"
+              class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold transition flex-shrink-0">
               Buscar
             </button>
+          </div>
+          <div id="estadoBusquedaBE" class="hidden rounded-xl border border-slate-200 bg-slate-50 px-4 py-8 text-sm text-slate-500 text-center"></div>
+          <div id="resultadosBusqueda" class="space-y-2"></div>
+        </div>
 
-            <!-- Resultados de búsqueda -->
-            <div id="resultadosBusqueda" class="mt-6"></div>
+        <!-- PANEL DETALLES -->
+        <div id="panelDetallesBE" class="hidden overflow-y-auto flex-1">
+
+          <!-- Sub-header con volver -->
+          <div class="flex items-center gap-3 px-6 py-4 border-b flex-shrink-0">
+            <button id="btnVolverBusqueda"
+              class="inline-flex items-center gap-2 text-sm font-medium text-gray-500 hover:text-gray-700 border rounded-lg px-3 py-1.5 hover:bg-gray-50 transition">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clip-rule="evenodd"/>
+              </svg>
+              Volver
+            </button>
+            <span id="subtituloDetalleBE" class="text-sm font-semibold text-gray-700 truncate"></span>
+            <div class="ml-auto flex-shrink-0">
+              <button id="btnModoEdicion"
+                class="inline-flex items-center gap-2 px-4 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium transition">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                  <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z"/>
+                </svg>
+                Editar datos
+              </button>
+            </div>
           </div>
 
-          <!-- TAB 2: Detalles y Edición -->
-          <div id="tabEdicion" class="tab-content hidden">
-            <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">
-              <svg class="inline-block w-6 h-6 mr-2 text-indigo-600">
-                <use xlink:href="#pencil-square-outline"></use>
-              </svg>
-              Detalles del Alumno
-            </h2>
-
-            <!-- Botones de acción (solo visible al ver detalles) -->
-            <div id="botonesAccion" class="flex gap-2 mb-6 hidden">
-              <button 
-                id="btnVolverBusqueda" 
-                class="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold py-2 rounded-lg transition"
-              >
-                Volver
-              </button>
-              <button 
-                id="btnModoEdicion" 
-                class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 rounded-lg transition"
-              >
-                Editar
-              </button>
-            </div>
-
-            <!-- Vista de solo lectura (detalles) -->
-            <div id="vistaDetalles" class="grid grid-cols-1 md:grid-cols-2 gap-6 hidden">
-              <!-- Tarjeta Alumno -->
-              <div class="bg-gradient-to-br from-blue-50 to-blue-100 p-6 rounded-lg border border-blue-200">
-                <h3 class="text-lg font-bold text-blue-900 mb-4">Alumno</h3>
-                <div class="space-y-3 text-sm">
-                  <div><span class="font-semibold text-blue-800">Legajo:</span> <span id="det_legajo" class="text-gray-700">-</span></div>
-                  <div><span class="font-semibold text-blue-800">Nombre:</span> <span id="det_nombre" class="text-gray-700">-</span></div>
-                  <div><span class="font-semibold text-blue-800">Apellido:</span> <span id="det_apellido" class="text-gray-700">-</span></div>
-                  <div><span class="font-semibold text-blue-800">DNI:</span> <span id="det_dni" class="text-gray-700">-</span></div>
-                  <div><span class="font-semibold text-blue-800">CUIL:</span> <span id="det_cuil" class="text-gray-700">-</span></div>
-                  <div><span class="font-semibold text-blue-800">Email:</span> <span id="det_email" class="text-gray-700">-</span></div>
-                  <div><span class="font-semibold text-blue-800">Dirección:</span> <span id="det_direccion" class="text-gray-700">-</span></div>
-                  <div><span class="font-semibold text-blue-800">F. Nacimiento:</span> <span id="det_fecha_nacimiento" class="text-gray-700">-</span></div>
+          <!-- Vista detalles -->
+          <div id="vistaDetalles" class="p-6 space-y-5">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <!-- Card Alumno -->
+              <div class="rounded-xl border-2 border-blue-200 bg-blue-50 p-5">
+                <h4 class="text-sm font-bold text-blue-700 uppercase tracking-wide mb-3 flex items-center gap-2">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"/>
+                  </svg>
+                  Alumno
+                </h4>
+                <div class="space-y-1.5 text-sm">
+                  <div class="flex justify-between"><span class="text-blue-600 font-medium">Legajo</span><span id="det_legajo" class="text-gray-800 font-medium">-</span></div>
+                  <div class="flex justify-between"><span class="text-blue-600 font-medium">Nombre</span><span id="det_nombre" class="text-gray-800">-</span></div>
+                  <div class="flex justify-between"><span class="text-blue-600 font-medium">Apellido</span><span id="det_apellido" class="text-gray-800">-</span></div>
+                  <div class="flex justify-between"><span class="text-blue-600 font-medium">DNI</span><span id="det_dni" class="text-gray-800">-</span></div>
+                  <div class="flex justify-between"><span class="text-blue-600 font-medium">CUIL</span><span id="det_cuil" class="text-gray-800">-</span></div>
+                  <div class="flex justify-between"><span class="text-blue-600 font-medium">Email</span><span id="det_email" class="text-gray-800 truncate max-w-xs">-</span></div>
+                  <div class="flex justify-between"><span class="text-blue-600 font-medium">Dirección</span><span id="det_direccion" class="text-gray-800">-</span></div>
+                  <div class="flex justify-between"><span class="text-blue-600 font-medium">F. Nacimiento</span><span id="det_fecha_nacimiento" class="text-gray-800">-</span></div>
+                  <div class="flex justify-between"><span class="text-blue-600 font-medium">Hermanos</span><span id="det_hermanos" class="text-gray-800">-</span></div>
                 </div>
               </div>
-
-              <!-- Tarjeta Tutor -->
-              <div class="bg-gradient-to-br from-purple-50 to-purple-100 p-6 rounded-lg border border-purple-200">
-                <h3 class="text-lg font-bold text-purple-900 mb-4">Tutor</h3>
-                <div class="space-y-3 text-sm">
-                  <div><span class="font-semibold text-purple-800">Nombre:</span> <span id="det_tutor_nombre" class="text-gray-700">-</span></div>
-                  <div><span class="font-semibold text-purple-800">Apellido:</span> <span id="det_tutor_apellido" class="text-gray-700">-</span></div>
-                  <div><span class="font-semibold text-purple-800">DNI:</span> <span id="det_tutor_dni" class="text-gray-700">-</span></div>
-                  <div><span class="font-semibold text-purple-800">CUIL:</span> <span id="det_tutor_cuil" class="text-gray-700">-</span></div>
-                  <div><span class="font-semibold text-purple-800">Teléfono:</span> <span id="det_tutor_telefono" class="text-gray-700">-</span></div>
-                  <div><span class="font-semibold text-purple-800">Email:</span> <span id="det_tutor_email" class="text-gray-700">-</span></div>
-                  <div><span class="font-semibold text-purple-800">Dirección:</span> <span id="det_tutor_direccion" class="text-gray-700">-</span></div>
+              <!-- Card Tutor -->
+              <div class="rounded-xl border-2 border-purple-200 bg-purple-50 p-5">
+                <h4 class="text-sm font-bold text-purple-700 uppercase tracking-wide mb-3 flex items-center gap-2">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                    <path d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v1h8v-1zM6 8a2 2 0 11-4 0 2 2 0 014 0zM16 18v-1a5.972 5.972 0 00-.75-2.906A3.005 3.005 0 0119 15v1h-3zM4.75 12.094A5.973 5.973 0 004 15v1H1v-1a3 3 0 013.75-2.906z"/>
+                  </svg>
+                  Tutor / Responsable
+                </h4>
+                <div class="space-y-1.5 text-sm">
+                  <div class="flex justify-between"><span class="text-purple-600 font-medium">Nombre</span><span id="det_tutor_nombre" class="text-gray-800">-</span></div>
+                  <div class="flex justify-between"><span class="text-purple-600 font-medium">Apellido</span><span id="det_tutor_apellido" class="text-gray-800">-</span></div>
+                  <div class="flex justify-between"><span class="text-purple-600 font-medium">DNI</span><span id="det_tutor_dni" class="text-gray-800">-</span></div>
+                  <div class="flex justify-between"><span class="text-purple-600 font-medium">CUIL</span><span id="det_tutor_cuil" class="text-gray-800">-</span></div>
+                  <div class="flex justify-between"><span class="text-purple-600 font-medium">Teléfono</span><span id="det_tutor_telefono" class="text-gray-800">-</span></div>
+                  <div class="flex justify-between"><span class="text-purple-600 font-medium">Email</span><span id="det_tutor_email" class="text-gray-800 truncate max-w-xs">-</span></div>
+                  <div class="flex justify-between"><span class="text-purple-600 font-medium">Dirección</span><span id="det_tutor_direccion" class="text-gray-800">-</span></div>
                 </div>
               </div>
             </div>
 
-            <!-- Formulario de edición (oculto hasta que click en Editar) -->
-            <form id="formEditarAlumnoModal" class="form-grid hidden">
-              <!-- Datos del Alumno -->
-              <fieldset>
-                <legend>Datos del Alumno</legend>
-                
-                <label for="edit_legajo_modal">Legajo</label>
-                <input type="text" id="edit_legajo_modal" name="legajo" maxlength="8" required>
+            <!-- Card Curso + Materias -->
+            <div id="seccionCursoBE">
+              <div id="cargandoCursoBE" class="rounded-xl border border-slate-200 bg-slate-50 px-4 py-4 text-sm text-slate-500 text-center animate-pulse">
+                Cargando información del curso...
+              </div>
+              <div id="cursoBEContenido" class="hidden rounded-xl border-2 border-emerald-200 bg-emerald-50 p-5">
+                <h4 class="text-sm font-bold text-emerald-700 uppercase tracking-wide mb-3 flex items-center gap-2">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
+                  </svg>
+                  Curso asignado
+                </h4>
+                <div class="flex flex-wrap gap-4 mb-4">
+                  <div class="flex flex-col">
+                    <span class="text-xs text-emerald-600 font-medium">Año</span>
+                    <span id="det_curso_anio" class="text-base font-bold text-gray-800">-</span>
+                  </div>
+                  <div class="flex flex-col">
+                    <span class="text-xs text-emerald-600 font-medium">División</span>
+                    <span id="det_curso_division" class="text-base font-bold text-gray-800">-</span>
+                  </div>
+                  <div class="flex flex-col">
+                    <span class="text-xs text-emerald-600 font-medium">Año lectivo</span>
+                    <span id="det_curso_anio_lectivo" class="text-base font-bold text-gray-800">-</span>
+                  </div>
+                  <div class="flex flex-col">
+                    <span class="text-xs text-emerald-600 font-medium">Plan</span>
+                    <span id="det_curso_plan" class="text-base font-bold text-gray-800">-</span>
+                  </div>
+                </div>
+                <div>
+                  <p class="text-xs font-semibold text-emerald-600 uppercase tracking-wide mb-2">Materias</p>
+                  <div id="det_materias" class="flex flex-wrap gap-2"></div>
+                </div>
+              </div>
+              <div id="cursoBESinAsignar" class="hidden rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-700 flex items-center gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 flex-shrink-0" viewBox="0 0 20 20" fill="currentColor">
+                  <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+                </svg>
+                Este alumno aún no tiene un curso asignado.
+              </div>
+            </div>
+          </div>
 
-                <label for="edit_nombre_modal">Nombre</label>
-                <input type="text" id="edit_nombre_modal" name="nombre" maxlength="15" required>
+          <!-- Panel edición -->
+          <div id="panelEdicionBE" class="hidden p-6">
+            <!-- Tabs edición -->
+            <div class="flex border-b mb-5">
+              <button id="tabEditAlumno" class="px-4 py-2.5 text-sm font-medium border-b-2 border-blue-600 text-blue-600 -mb-px">Datos del Alumno</button>
+              <button id="tabEditTutor"  class="px-4 py-2.5 text-sm font-medium border-b-2 border-transparent text-gray-500 hover:text-gray-700 -mb-px">Datos del Tutor</button>
+            </div>
 
-                <label for="edit_apellido_modal">Apellido</label>
-                <input type="text" id="edit_apellido_modal" name="apellido" maxlength="15" required>
+            <form id="formEditarAlumnoModal" class="space-y-4">
+              <!-- Panel alumno edición -->
+              <div id="pEditAlumno" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div class="flex flex-col gap-1.5">
+                  <label class="text-sm font-medium text-gray-700">Legajo <span class="text-red-500">*</span></label>
+                  <input type="text" id="edit_legajo_modal" name="legajo" maxlength="8" required
+                    class="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-300 focus:bg-white transition">
+                </div>
+                <div class="flex flex-col gap-1.5">
+                  <label class="text-sm font-medium text-gray-700">Nombre <span class="text-red-500">*</span></label>
+                  <input type="text" id="edit_nombre_modal" name="nombre" maxlength="15" required
+                    class="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-300 focus:bg-white transition">
+                </div>
+                <div class="flex flex-col gap-1.5">
+                  <label class="text-sm font-medium text-gray-700">Apellido <span class="text-red-500">*</span></label>
+                  <input type="text" id="edit_apellido_modal" name="apellido" maxlength="15" required
+                    class="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-300 focus:bg-white transition">
+                </div>
+                <div class="flex flex-col gap-1.5">
+                  <label class="text-sm font-medium text-gray-700">DNI <span class="text-red-500">*</span></label>
+                  <input type="text" id="edit_dni_modal" name="dni" maxlength="8" required
+                    class="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-300 focus:bg-white transition">
+                </div>
+                <div class="flex flex-col gap-1.5">
+                  <label class="text-sm font-medium text-gray-700">CUIL <span class="text-red-500">*</span></label>
+                  <input type="text" id="edit_cuil_modal" name="cuil" maxlength="11" required
+                    class="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-300 focus:bg-white transition">
+                </div>
+                <div class="flex flex-col gap-1.5">
+                  <label class="text-sm font-medium text-gray-700">Email</label>
+                  <input type="email" id="edit_email_modal" name="email" maxlength="30"
+                    class="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-300 focus:bg-white transition">
+                </div>
+                <div class="flex flex-col gap-1.5">
+                  <label class="text-sm font-medium text-gray-700">Dirección</label>
+                  <input type="text" id="edit_direccion_modal" name="direccion" maxlength="50"
+                    class="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-300 focus:bg-white transition">
+                </div>
+                <div class="flex flex-col gap-1.5">
+                  <label class="text-sm font-medium text-gray-700">Fecha de Nacimiento</label>
+                  <input type="date" id="edit_fecha_nacimiento_modal" name="fecha_nacimiento"
+                    class="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-300 focus:bg-white transition">
+                </div>
+                <div class="flex flex-col gap-1.5 sm:col-span-2">
+                  <label class="text-sm font-medium text-gray-700">Link Documentación</label>
+                  <input type="text" id="edit_link_docu_modal" name="link_docu" maxlength="100"
+                    class="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-300 focus:bg-white transition">
+                </div>
+                <div class="flex flex-col gap-1.5 sm:col-span-2">
+                  <label class="text-sm font-medium text-gray-700">¿Hermanos en la institución?</label>
+                  <div class="relative">
+                    <select id="edit_hermanos_modal" name="hermanos"
+                      class="w-full appearance-none border border-gray-200 rounded-xl px-3 py-2.5 text-sm bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-300 focus:bg-white transition">
+                      <option value="false">No</option>
+                      <option value="true">Sí</option>
+                    </select>
+                    <svg class="pointer-events-none absolute right-3 top-1/2 h-4 w-4 text-gray-400" style="transform:translateY(-50%)" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                      <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"/>
+                    </svg>
+                  </div>
+                </div>
+              </div>
 
-                <label for="edit_dni_modal">DNI</label>
-                <input type="text" id="edit_dni_modal" name="dni" maxlength="8" required>
+              <!-- Panel tutor edición -->
+              <div id="pEditTutor" class="hidden grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div class="flex flex-col gap-1.5">
+                  <label class="text-sm font-medium text-gray-700">Nombre</label>
+                  <input type="text" id="edit_tutor_nombre_modal" name="tutor_nombre" maxlength="15"
+                    class="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-300 focus:bg-white transition">
+                </div>
+                <div class="flex flex-col gap-1.5">
+                  <label class="text-sm font-medium text-gray-700">Apellido</label>
+                  <input type="text" id="edit_tutor_apellido_modal" name="tutor_apellido" maxlength="15"
+                    class="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-300 focus:bg-white transition">
+                </div>
+                <div class="flex flex-col gap-1.5">
+                  <label class="text-sm font-medium text-gray-700">DNI</label>
+                  <input type="text" id="edit_tutor_dni_modal" name="tutor_dni" maxlength="8"
+                    class="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-300 focus:bg-white transition">
+                </div>
+                <div class="flex flex-col gap-1.5">
+                  <label class="text-sm font-medium text-gray-700">CUIL</label>
+                  <input type="text" id="edit_tutor_cuil_modal" name="tutor_cuil" maxlength="11"
+                    class="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-300 focus:bg-white transition">
+                </div>
+                <div class="flex flex-col gap-1.5">
+                  <label class="text-sm font-medium text-gray-700">Teléfono</label>
+                  <input type="text" id="edit_tutor_telefono_modal" name="tutor_telefono" maxlength="15"
+                    class="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-300 focus:bg-white transition">
+                </div>
+                <div class="flex flex-col gap-1.5">
+                  <label class="text-sm font-medium text-gray-700">Email</label>
+                  <input type="email" id="edit_tutor_email_modal" name="tutor_email" maxlength="30"
+                    class="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-300 focus:bg-white transition">
+                </div>
+                <div class="flex flex-col gap-1.5 sm:col-span-2">
+                  <label class="text-sm font-medium text-gray-700">Dirección</label>
+                  <input type="text" id="edit_tutor_direccion_modal" name="tutor_direccion" maxlength="50"
+                    class="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-300 focus:bg-white transition">
+                </div>
+              </div>
 
-                <label for="edit_cuil_modal">CUIL</label>
-                <input type="text" id="edit_cuil_modal" name="cuil" maxlength="11" required>
-
-                <label for="edit_email_modal">Email</label>
-                <input type="email" id="edit_email_modal" name="email" maxlength="30">
-
-                <label for="edit_direccion_modal">Dirección</label>
-                <input type="text" id="edit_direccion_modal" name="direccion" maxlength="50">
-
-                <label for="edit_link_docu_modal">Link Documentación</label>
-                <input type="text" id="edit_link_docu_modal" name="link_docu" maxlength="100">
-
-                <label for="edit_fecha_nacimiento_modal">Fecha de Nacimiento</label>
-                <input type="date" id="edit_fecha_nacimiento_modal" name="fecha_nacimiento">
-
-                <label for="edit_hermanos_modal">¿Tiene hermanos en la institución?</label>
-                <select id="edit_hermanos_modal" name="hermanos">
-                  <option value="false">No</option>
-                  <option value="true">Sí</option>
-                </select>
-              </fieldset>
-
-              <!-- Datos del Tutor -->
-              <fieldset>
-                <legend>Datos del Tutor</legend>
-
-                <label for="edit_tutor_nombre_modal">Nombre</label>
-                <input type="text" id="edit_tutor_nombre_modal" name="tutor_nombre" maxlength="15">
-
-                <label for="edit_tutor_apellido_modal">Apellido</label>
-                <input type="text" id="edit_tutor_apellido_modal" name="tutor_apellido" maxlength="15">
-
-                <label for="edit_tutor_dni_modal">DNI</label>
-                <input type="text" id="edit_tutor_dni_modal" name="tutor_dni" maxlength="8">
-
-                <label for="edit_tutor_cuil_modal">CUIL</label>
-                <input type="text" id="edit_tutor_cuil_modal" name="tutor_cuil" maxlength="11">
-
-                <label for="edit_tutor_telefono_modal">Teléfono</label>
-                <input type="text" id="edit_tutor_telefono_modal" name="tutor_telefono" maxlength="15">
-
-                <label for="edit_tutor_email_modal">Email</label>
-                <input type="email" id="edit_tutor_email_modal" name="tutor_email" maxlength="30">
-
-                <label for="edit_tutor_direccion_modal">Dirección</label>
-                <input type="text" id="edit_tutor_direccion_modal" name="tutor_direccion" maxlength="50">
-              </fieldset>
-
-              <div class="form-actions flex gap-2">
-                <button type="button" onclick="mostrarDetalles()" class="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold py-2 rounded-lg transition">
+              <!-- Feedback + botones -->
+              <div id="feedbackEditarBE" class="hidden rounded-xl px-4 py-3 text-sm border mt-2"></div>
+              <div class="flex items-center justify-between pt-2">
+                <button type="button" id="btnCancelarEdicionBE"
+                  class="px-4 py-2.5 rounded-xl border border-gray-200 text-sm font-medium text-gray-600 hover:bg-gray-50 transition">
                   Cancelar
                 </button>
-                <button type="submit" class="flex-1 bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white font-semibold py-2 rounded-lg transition">
+                <button type="submit" id="btnGuardarCambiosBE"
+                  class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-green-600 hover:bg-green-700 text-white text-sm font-semibold transition">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                  </svg>
                   Guardar Cambios
                 </button>
               </div>
             </form>
           </div>
+
         </div>
       </div>
     </div>
 
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <!-- Scripts inline                                          -->
+    <!-- ═══════════════════════════════════════════════════════ -->
     <script>
-      document.addEventListener("DOMContentLoaded", () => {
-        const altura = document.documentElement.scrollHeight;
+      function mostrarModalTW(id) {
+        const m = document.getElementById(id);
+        if (m) { m.classList.remove('hidden'); m.classList.add('flex'); }
+      }
+      function ocultarModalTW(id) {
+        const m = document.getElementById(id);
+        if (m) { m.classList.add('hidden'); m.classList.remove('flex'); }
+      }
 
-        // Enviamos un mensaje al documento padre (index.html)
-        parent.postMessage({
-          tipo: "ajustarAltura",
-          altura: altura
-        }, "*");
+      function mostrarModalInscripcion() {
+        document.getElementById('formAlumno').reset();
+        const fb = document.getElementById('feedbackInscripcion');
+        if (fb) { fb.textContent = ''; fb.classList.add('hidden'); }
+        cambiarTabInscripcion('alumno');
+        mostrarModalTW('modalFormAlumno');
+      }
 
-        // Interceptar envío de formularios y limpiar formato antes de enviar
-        const formCrear = document.getElementById('formAlumno');
-        const formEditar = document.getElementById('formAlumnoEditar');
-
-        if (formCrear) {
-          formCrear.addEventListener('submit', () => {
-            limpiarDatosAntesDeEnviar(formCrear);
-          });
+      function cambiarTabInscripcion(tab) {
+        const tabAlumno   = document.getElementById('tabInscAlumno');
+        const tabTutor    = document.getElementById('tabInscTutor');
+        const panelAlumno = document.getElementById('panelInscAlumno');
+        const panelTutor  = document.getElementById('panelInscTutor');
+        const activo  = 'px-4 py-3 text-sm font-medium border-b-2 border-blue-600 text-blue-600 -mb-px flex items-center gap-2';
+        const inactivo= 'px-4 py-3 text-sm font-medium border-b-2 border-transparent text-gray-500 hover:text-gray-700 -mb-px flex items-center gap-2';
+        if (tab === 'alumno') {
+          tabAlumno.className = activo;  tabTutor.className  = inactivo;
+          panelAlumno.classList.remove('hidden'); panelTutor.classList.add('hidden');
+        } else {
+          tabTutor.className  = activo;  tabAlumno.className = inactivo;
+          panelTutor.classList.remove('hidden'); panelAlumno.classList.add('hidden');
         }
-
-        if (formEditar) {
-          formEditar.addEventListener('submit', () => {
-            limpiarDatosAntesDeEnviar(formEditar);
-          });
-        }
-      });
+      }
 
       function limpiarDatosAntesDeEnviar(form) {
-        const camposFormateados = [
-          'dni', 'cuil', 'tutor_dni', 'tutor_cuil',
-          'edit_dni', 'edit_cuil', 'edit_tutor_dni', 'edit_tutor_cuil',
-          'edit_dni_modal', 'edit_cuil_modal', 'edit_tutor_dni_modal', 'edit_tutor_cuil_modal'
-        ];
-
-        camposFormateados.forEach(id => {
+        ['dni','cuil','tutor_dni','tutor_cuil',
+         'edit_dni','edit_cuil','edit_tutor_dni','edit_tutor_cuil',
+         'edit_dni_modal','edit_cuil_modal','edit_tutor_dni_modal','edit_tutor_cuil_modal'
+        ].forEach(id => {
           const input = form.querySelector(`#${id}`);
-          if (input) {
-            input.value = input.value.replace(/\D/g, ''); // Deja solo números
-          }
+          if (input) input.value = input.value.replace(/\D/g, '');
         });
       }
-    </script>
 
-    <script>
-      window.addEventListener("load", () => {
-        const altura = document.documentElement.scrollHeight;
-        
-        // Enviamos un mensaje al documento padre (index.html)
-        parent.postMessage({
-          tipo: "ajustarAltura",
-          altura: altura
-        }, "*");
+      document.addEventListener('DOMContentLoaded', () => {
+        document.getElementById('tabInscAlumno')?.addEventListener('click', () => cambiarTabInscripcion('alumno'));
+        document.getElementById('tabInscTutor')?.addEventListener('click',  () => cambiarTabInscripcion('tutor'));
+        document.getElementById('btnSiguienteTutor')?.addEventListener('click', () => cambiarTabInscripcion('tutor'));
+        document.getElementById('btnVolverAlumno')?.addEventListener('click',   () => cambiarTabInscripcion('alumno'));
+        document.getElementById('btnCerrarModalInscripcion')?.addEventListener('click', () => ocultarModalTW('modalFormAlumno'));
+        document.getElementById('btnCancelarInscripcion')?.addEventListener('click',    () => ocultarModalTW('modalFormAlumno'));
+
+        const formCrear  = document.getElementById('formAlumno');
+        const formEditar = document.getElementById('formAlumnoEditar');
+        formCrear?.addEventListener('submit',  () => limpiarDatosAntesDeEnviar(formCrear));
+        formEditar?.addEventListener('submit', () => limpiarDatosAntesDeEnviar(formEditar));
+
+        parent.postMessage({ tipo: 'ajustarAltura', altura: document.documentElement.scrollHeight }, '*');
+      });
+
+      window.addEventListener('load', () => {
+        parent.postMessage({ tipo: 'ajustarAltura', altura: document.documentElement.scrollHeight }, '*');
       });
     </script>
 
@@ -532,17 +724,14 @@
     <script src="/assets/js/modal.js"></script>
     <script src="/assets/js/js/pageAccess.js"></script>
     <script src="/assets/js/validacionesFormulario.js"></script>
+    <script src="/assets/js/js/log.js"></script>
     <script src="/assets/js/buscareditar.js"></script>
 
     <script>
-        //Cargar iconos
         fetch('/assets/icons/iconos.svg')
         .then(res => res.text())
-        .then(data => {
-            document.getElementById('svg-sprite').innerHTML = data;
-        });
+        .then(data => { document.getElementById('svg-sprite').innerHTML = data; });
     </script>
 
 </body>
-
 </html>

@@ -6,6 +6,11 @@ let modoMateria = "crear";
 let alumnosCache = [];
 let profesoresCache = [];
 
+// ── Variables para el modal de asignar alumnos ────────────────
+let alumnosSinCursoCache = [];
+let alumnosSeleccionados = new Set();
+let masivaYaCargada = false;
+
 document.addEventListener("DOMContentLoaded", () => {
   const ordenMaterias = document.getElementById("ordenMaterias");
   if (ordenMaterias) {
@@ -16,72 +21,420 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   const btnEditarCurso = document.getElementById("btnEditarCurso");
-  if (btnEditarCurso) {
-    btnEditarCurso.addEventListener("click", abrirEditarCurso);
-  }
+  if (btnEditarCurso) btnEditarCurso.addEventListener("click", abrirEditarCurso);
 
   const btnEliminarCurso = document.getElementById("btnEliminarCurso");
-  if (btnEliminarCurso) {
-    btnEliminarCurso.addEventListener("click", eliminarCurso);
-  }
+  if (btnEliminarCurso) btnEliminarCurso.addEventListener("click", eliminarCurso);
 
   const btnCancelarCurso = document.getElementById("btnCancelarCurso");
-  if (btnCancelarCurso) {
-    btnCancelarCurso.addEventListener("click", () => ocultarModal("modalCurso"));
-  }
+  if (btnCancelarCurso) btnCancelarCurso.addEventListener("click", () => ocultarModal("modalCurso"));
 
   const btnCancelarMateria = document.getElementById("btnCancelarMateria");
-  if (btnCancelarMateria) {
-    btnCancelarMateria.addEventListener("click", () => ocultarModal("modalMateria"));
-  }
+  if (btnCancelarMateria) btnCancelarMateria.addEventListener("click", () => ocultarModal("modalMateria"));
 
   const btnAgregarMateria = document.getElementById("btnAgregarMateria");
-  if (btnAgregarMateria) {
-    btnAgregarMateria.addEventListener("click", abrirCrearMateria);
-  }
+  if (btnAgregarMateria) btnAgregarMateria.addEventListener("click", abrirCrearMateria);
 
   const btnAgregarSegundoProfesor = document.getElementById("btnAgregarSegundoProfesor");
-  if (btnAgregarSegundoProfesor) {
-    btnAgregarSegundoProfesor.addEventListener("click", () => {
-      mostrarSegundoProfesor();
-    });
-  }
+  if (btnAgregarSegundoProfesor) btnAgregarSegundoProfesor.addEventListener("click", mostrarSegundoProfesor);
 
   const btnQuitarSegundoProfesor = document.getElementById("btnQuitarSegundoProfesor");
-  if (btnQuitarSegundoProfesor) {
-    btnQuitarSegundoProfesor.addEventListener("click", () => {
-      ocultarSegundoProfesor();
+  if (btnQuitarSegundoProfesor) btnQuitarSegundoProfesor.addEventListener("click", ocultarSegundoProfesor);
+
+  const formCursoEditar = document.getElementById("formCursoEditar");
+  if (formCursoEditar) formCursoEditar.addEventListener("submit", actualizarCurso);
+
+  const formMateriaEditar = document.getElementById("formMateriaEditar");
+  if (formMateriaEditar) formMateriaEditar.addEventListener("submit", guardarMateria);
+
+  // ── Listeners del modal asignar alumnos ──
+  const btnAsignarAlumnos = document.getElementById("btnAsignarAlumnos");
+  if (btnAsignarAlumnos) btnAsignarAlumnos.addEventListener("click", abrirModalAsignarAlumnos);
+
+  const btnCerrarAsignarAlumnos = document.getElementById("btnCerrarAsignarAlumnos");
+  if (btnCerrarAsignarAlumnos) btnCerrarAsignarAlumnos.addEventListener("click", () => ocultarModal("modalAsignarAlumnos"));
+
+  const tabManual = document.getElementById("tabManual");
+  if (tabManual) tabManual.addEventListener("click", () => cambiarTabAsignar("manual"));
+
+  const tabMasiva = document.getElementById("tabMasiva");
+  if (tabMasiva) tabMasiva.addEventListener("click", () => cambiarTabAsignar("masiva"));
+
+  const btnBuscarAlumno = document.getElementById("btnBuscarAlumno");
+  if (btnBuscarAlumno) btnBuscarAlumno.addEventListener("click", buscarAlumnoManual);
+
+  const inputBuscarAlumno = document.getElementById("inputBuscarAlumno");
+  if (inputBuscarAlumno) {
+    inputBuscarAlumno.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") buscarAlumnoManual();
     });
   }
 
-  const formCursoEditar = document.getElementById("formCursoEditar");
-  if (formCursoEditar) {
-    formCursoEditar.addEventListener("submit", actualizarCurso);
-  }
+  const checkTodos = document.getElementById("checkTodos");
+  if (checkTodos) checkTodos.addEventListener("change", toggleSeleccionarTodos);
 
-  const formMateriaEditar = document.getElementById("formMateriaEditar");
-  if (formMateriaEditar) {
-    formMateriaEditar.addEventListener("submit", guardarMateria);
-  }
+  const btnAsignarMasivo = document.getElementById("btnAsignarMasivo");
+  if (btnAsignarMasivo) btnAsignarMasivo.addEventListener("click", ejecutarAsignacionMasiva);
 
+  // ── Inicialización ──
   const cursoSeleccionado = obtenerCursoSeleccionado();
   const idCurso = cursoSeleccionado?.id;
   if (!idCurso) {
     mostrarError("No se encontró el curso seleccionado. Volviendo al listado...");
     ocultarSkeleton();
     if (window.top && typeof window.top.cargarVista === "function") {
-      setTimeout(() => {
-        window.top.cargarVista("cursos/cursos_general.html");
-      }, 800);
+      setTimeout(() => window.top.cargarVista("cursos/cursos_general.html"), 800);
     }
     return;
   }
 
   cargarCurso(idCurso);
-  cargarProfesoresDisponibles().catch((error) => {
-    console.error(error);
-  });
+  cargarProfesoresDisponibles().catch(console.error);
 });
+
+// ════════════════════════════════════════════════════════════════
+// MODAL ASIGNAR ALUMNOS
+// ════════════════════════════════════════════════════════════════
+
+async function abrirModalAsignarAlumnos() {
+  alumnosSeleccionados.clear();
+  masivaYaCargada = false;
+  limpiarFeedback("feedbackManual");
+  limpiarFeedback("feedbackMasiva");
+
+  const input = document.getElementById("inputBuscarAlumno");
+  if (input) input.value = "";
+
+  const resultados = document.getElementById("resultadosBusqueda");
+  if (resultados) resultados.innerHTML = "";
+
+  cambiarTabAsignar("manual");
+  mostrarModal("modalAsignarAlumnos");
+}
+
+function cambiarTabAsignar(tab) {
+  const tabManual = document.getElementById("tabManual");
+  const tabMasiva = document.getElementById("tabMasiva");
+  const panelManual = document.getElementById("panelManual");
+  const panelMasiva = document.getElementById("panelMasiva");
+
+  if (tab === "manual") {
+    tabManual.className = "px-4 py-3 text-sm font-medium border-b-2 border-blue-600 text-blue-600 -mb-px";
+    tabMasiva.className = "px-4 py-3 text-sm font-medium border-b-2 border-transparent text-gray-500 hover:text-gray-700 -mb-px";
+    panelManual.classList.remove("hidden");
+    panelMasiva.classList.add("hidden");
+  } else {
+    tabMasiva.className = "px-4 py-3 text-sm font-medium border-b-2 border-blue-600 text-blue-600 -mb-px";
+    tabManual.className = "px-4 py-3 text-sm font-medium border-b-2 border-transparent text-gray-500 hover:text-gray-700 -mb-px";
+    panelMasiva.classList.remove("hidden");
+    panelManual.classList.add("hidden");
+
+    if (!masivaYaCargada) {
+      cargarAlumnosSinCurso();
+    }
+  }
+}
+
+async function cargarAlumnosSinCurso() {
+  const estadoMasiva = document.getElementById("estadoMasiva");
+  const listaMasivaWrapper = document.getElementById("listaMasivaWrapper");
+
+  if (estadoMasiva) {
+    estadoMasiva.textContent = "Cargando alumnos...";
+    estadoMasiva.className = "rounded-lg border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-600";
+    estadoMasiva.classList.remove("hidden");
+  }
+  if (listaMasivaWrapper) listaMasivaWrapper.classList.add("hidden");
+
+  try {
+    const res = await fetchWithAuth("/cursos/alumnos-sin-curso");
+    if (!res.ok) throw new Error("No se pudo obtener la lista");
+
+    const data = await res.json();
+    alumnosSinCursoCache = Array.isArray(data) ? data : [];
+    masivaYaCargada = true;
+
+    // Resetear selección
+    alumnosSeleccionados.clear();
+    const checkTodos = document.getElementById("checkTodos");
+    if (checkTodos) checkTodos.checked = false;
+    actualizarContadorMasiva();
+
+    renderListaMasiva(alumnosSinCursoCache);
+  } catch (error) {
+    console.error(error);
+    if (estadoMasiva) {
+      estadoMasiva.textContent = "No se pudo cargar la lista de alumnos.";
+      estadoMasiva.className = "rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700";
+    }
+  }
+}
+
+function renderListaMasiva(alumnos) {
+  const estadoMasiva = document.getElementById("estadoMasiva");
+  const listaMasivaWrapper = document.getElementById("listaMasivaWrapper");
+
+  if (!listaMasivaWrapper) return;
+
+  listaMasivaWrapper.innerHTML = "";
+
+  if (!alumnos.length) {
+    if (estadoMasiva) {
+      estadoMasiva.textContent = "No hay alumnos sin curso asignado.";
+      estadoMasiva.className = "rounded-lg border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-600";
+      estadoMasiva.classList.remove("hidden");
+    }
+    listaMasivaWrapper.classList.add("hidden");
+    return;
+  }
+
+  if (estadoMasiva) estadoMasiva.classList.add("hidden");
+  listaMasivaWrapper.classList.remove("hidden");
+
+  alumnos.forEach((alumno) => {
+    const fila = document.createElement("label");
+    fila.className = "flex items-center gap-3 px-4 py-3 hover:bg-slate-50 cursor-pointer select-none";
+
+    const checkbox = document.createElement("input");
+    checkbox.type = "checkbox";
+    checkbox.value = String(alumno.id_alumno);
+    checkbox.className = "w-4 h-4 cursor-pointer flex-shrink-0";
+    checkbox.checked = alumnosSeleccionados.has(alumno.id_alumno);
+
+    checkbox.addEventListener("change", () => {
+      if (checkbox.checked) {
+        alumnosSeleccionados.add(alumno.id_alumno);
+      } else {
+        alumnosSeleccionados.delete(alumno.id_alumno);
+        const checkTodos = document.getElementById("checkTodos");
+        if (checkTodos) checkTodos.checked = false;
+      }
+      actualizarContadorMasiva();
+    });
+
+    const info = document.createElement("div");
+    info.className = "flex-1 min-w-0";
+    info.innerHTML = `
+      <p class="text-sm font-medium text-slate-800">${escaparHtml(alumno.apellido)}, ${escaparHtml(alumno.nombre)}</p>
+      <p class="text-xs text-slate-500">DNI: ${escaparHtml(alumno.dni || "-")} · Legajo: ${escaparHtml(alumno.legajo || "-")}</p>
+    `;
+
+    fila.appendChild(checkbox);
+    fila.appendChild(info);
+    listaMasivaWrapper.appendChild(fila);
+  });
+}
+
+function toggleSeleccionarTodos() {
+  const checkTodos = document.getElementById("checkTodos");
+  const checkboxes = document.querySelectorAll("#listaMasivaWrapper input[type='checkbox']");
+
+  checkboxes.forEach((cb) => {
+    cb.checked = checkTodos.checked;
+    const id = Number(cb.value);
+    if (checkTodos.checked) {
+      alumnosSeleccionados.add(id);
+    } else {
+      alumnosSeleccionados.delete(id);
+    }
+  });
+
+  actualizarContadorMasiva();
+}
+
+function actualizarContadorMasiva() {
+  const count = alumnosSeleccionados.size;
+  const countEl = document.getElementById("countSeleccionados");
+  const btnMasivo = document.getElementById("btnAsignarMasivo");
+
+  if (countEl) countEl.textContent = `${count} seleccionado${count === 1 ? "" : "s"}`;
+  if (btnMasivo) {
+    btnMasivo.textContent = `Asignar seleccionados (${count})`;
+    btnMasivo.disabled = count === 0;
+  }
+}
+
+async function buscarAlumnoManual() {
+  const input = document.getElementById("inputBuscarAlumno");
+  const termino = input ? input.value.trim() : "";
+
+  limpiarFeedback("feedbackManual");
+  const resultadosEl = document.getElementById("resultadosBusqueda");
+  if (resultadosEl) resultadosEl.innerHTML = "";
+
+  if (termino.length < 2) {
+    mostrarFeedback("feedbackManual", "Ingresá al menos 2 caracteres para buscar.", "info");
+    return;
+  }
+
+  try {
+    const res = await fetchWithAuth(`/cursos/alumnos-sin-curso/buscar?q=${encodeURIComponent(termino)}`);
+    if (!res.ok) throw new Error("Error al buscar");
+    const data = await res.json();
+    renderResultadosBusqueda(Array.isArray(data) ? data : []);
+  } catch (error) {
+    mostrarFeedback("feedbackManual", "No se pudo realizar la búsqueda.", "error");
+  }
+}
+
+function renderResultadosBusqueda(alumnos) {
+  const contenedor = document.getElementById("resultadosBusqueda");
+  if (!contenedor) return;
+
+  contenedor.innerHTML = "";
+
+  if (!alumnos.length) {
+    contenedor.innerHTML = `
+      <p class="text-sm text-slate-500 rounded-lg border border-slate-200 bg-slate-50 px-4 py-3">
+        No se encontraron alumnos sin curso para esa búsqueda.
+      </p>`;
+    return;
+  }
+
+  alumnos.forEach((alumno) => {
+    const card = document.createElement("div");
+    card.className = "flex items-center justify-between gap-3 rounded-lg border border-slate-200 bg-white px-4 py-3";
+
+    card.innerHTML = `
+      <div>
+        <p class="text-sm font-medium text-slate-800">${escaparHtml(alumno.apellido)}, ${escaparHtml(alumno.nombre)}</p>
+        <p class="text-xs text-slate-500">DNI: ${escaparHtml(alumno.dni || "-")} · Legajo: ${escaparHtml(alumno.legajo || "-")}</p>
+      </div>
+      <button
+        class="flex-shrink-0 bg-green-600 hover:bg-green-700 text-white text-xs px-3 py-1.5 rounded-md font-medium transition"
+        data-id="${alumno.id_alumno}"
+        data-nombre="${escaparHtml(alumno.nombre)}"
+        data-apellido="${escaparHtml(alumno.apellido)}"
+      >
+        Asignar
+      </button>
+    `;
+
+    const btn = card.querySelector("button");
+    btn.addEventListener("click", () => {
+      asignarAlumnoManual(alumno.id_alumno, alumno.nombre, alumno.apellido, btn);
+    });
+
+    contenedor.appendChild(card);
+  });
+}
+
+async function asignarAlumnoManual(idAlumno, nombre, apellido, boton) {
+  if (!cursoActual) return;
+
+  if (boton) {
+    boton.disabled = true;
+    boton.textContent = "Asignando...";
+  }
+
+  limpiarFeedback("feedbackManual");
+
+  try {
+    const res = await fetchWithAuth("/cursos/asignar-curso", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ idAlumno, idCurso: cursoActual.id_curso }),
+    });
+
+    const data = await res.json();
+
+    if (!res.ok) {
+      mostrarFeedback("feedbackManual", data.error || "No se pudo asignar el alumno.", "error");
+      if (boton) { boton.disabled = false; boton.textContent = "Asignar"; }
+      return;
+    }
+
+    mostrarFeedback("feedbackManual", `${apellido}, ${nombre} fue asignado correctamente.`, "success");
+
+    // Eliminar la card del resultado
+    if (boton) boton.closest("div.flex")?.remove();
+
+    // Invalidar cache masiva y refrescar alumnos del curso
+    masivaYaCargada = false;
+    alumnosSinCursoCache = [];
+    await cargarAlumnosCurso(cursoActual.id_curso);
+  } catch (error) {
+    mostrarFeedback("feedbackManual", "Error al asignar el alumno.", "error");
+    if (boton) { boton.disabled = false; boton.textContent = "Asignar"; }
+  }
+}
+
+async function ejecutarAsignacionMasiva() {
+  if (alumnosSeleccionados.size === 0 || !cursoActual) return;
+
+  const btnMasivo = document.getElementById("btnAsignarMasivo");
+  if (btnMasivo) { btnMasivo.disabled = true; btnMasivo.textContent = "Asignando..."; }
+  limpiarFeedback("feedbackMasiva");
+
+  try {
+    const res = await fetchWithAuth("/cursos/asignar-masivo", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        idAlumnos: [...alumnosSeleccionados],
+        idCurso: cursoActual.id_curso,
+      }),
+    });
+
+    const data = await res.json();
+
+    if (!res.ok) {
+      mostrarFeedback("feedbackMasiva", data.error || "No se pudo realizar la asignación.", "error");
+      actualizarContadorMasiva();
+      return;
+    }
+
+    mostrarFeedback("feedbackMasiva", data.mensaje || "Alumnos asignados correctamente.", "success");
+
+    // Limpiar selección e invalidar cache
+    alumnosSeleccionados.clear();
+    masivaYaCargada = false;
+    alumnosSinCursoCache = [];
+
+    const checkTodos = document.getElementById("checkTodos");
+    if (checkTodos) checkTodos.checked = false;
+    actualizarContadorMasiva();
+
+    // Recargar lista masiva y alumnos del curso
+    await Promise.all([
+      cargarAlumnosSinCurso(),
+      cargarAlumnosCurso(cursoActual.id_curso),
+    ]);
+  } catch (error) {
+    mostrarFeedback("feedbackMasiva", "Error al asignar los alumnos.", "error");
+    actualizarContadorMasiva();
+  }
+}
+
+function mostrarFeedback(elementId, mensaje, tipo) {
+  const el = document.getElementById(elementId);
+  if (!el) return;
+
+  el.textContent = mensaje;
+  el.className = "rounded-lg px-4 py-3 text-sm";
+
+  if (tipo === "success") {
+    el.classList.add("bg-green-50", "border", "border-green-200", "text-green-700");
+  } else if (tipo === "error") {
+    el.classList.add("bg-red-50", "border", "border-red-200", "text-red-700");
+  } else {
+    el.classList.add("bg-slate-50", "border", "border-slate-200", "text-slate-600");
+  }
+
+  el.classList.remove("hidden");
+}
+
+function limpiarFeedback(elementId) {
+  const el = document.getElementById(elementId);
+  if (el) {
+    el.textContent = "";
+    el.classList.add("hidden");
+  }
+}
+
+// ════════════════════════════════════════════════════════════════
+// FUNCIONES EXISTENTES (sin cambios)
+// ════════════════════════════════════════════════════════════════
 
 async function cargarCurso(idCurso) {
   ocultarError();
@@ -93,17 +446,13 @@ async function cargarCurso(idCurso) {
       headers: { "Content-Type": "application/json" }
     });
 
-    if (!res.ok) {
-      throw new Error("No se pudo cargar el curso");
-    }
+    if (!res.ok) throw new Error("No se pudo cargar el curso");
 
     const data = await res.json();
     const curso = data.curso || data;
     const materias = Array.isArray(data.materias) ? data.materias : [];
 
-    if (!curso) {
-      throw new Error("Curso no encontrado");
-    }
+    if (!curso) throw new Error("Curso no encontrado");
 
     cursoActual = curso;
     persistirCursoSeleccionado(curso);
@@ -127,18 +476,10 @@ function renderCurso(curso) {
   const nombrePlan = document.getElementById("nombrePlan");
   const descripcionPlan = document.getElementById("descripcionPlan");
 
-  if (titulo) {
-    titulo.textContent = `${curso.anio} Año - División ${curso.division}`;
-  }
-  if (anioLectivo) {
-    anioLectivo.textContent = `Año lectivo ${curso.anio_lectivo}`;
-  }
-  if (nombrePlan) {
-    nombrePlan.textContent = curso.nombre_plan || "Sin plan asignado";
-  }
-  if (descripcionPlan) {
-    descripcionPlan.textContent = curso.descripcion || "Sin descripción disponible";
-  }
+  if (titulo) titulo.textContent = `${curso.anio} Año - División ${curso.division}`;
+  if (anioLectivo) anioLectivo.textContent = `Año lectivo ${curso.anio_lectivo}`;
+  if (nombrePlan) nombrePlan.textContent = curso.nombre_plan || "Sin plan asignado";
+  if (descripcionPlan) descripcionPlan.textContent = curso.descripcion || "Sin descripción disponible";
 }
 
 async function cargarAlumnosCurso(idCurso) {
@@ -175,9 +516,7 @@ async function obtenerAlumnosCurso(idCurso) {
 
   const data = await res.json();
 
-  if (!res.ok) {
-    throw new Error(data.error || "No se pudieron obtener los alumnos.");
-  }
+  if (!res.ok) throw new Error(data.error || "No se pudieron obtener los alumnos.");
 
   return {
     ...data,
@@ -273,11 +612,7 @@ function obtenerCursoSeleccionado() {
 
       if (idCurso) {
         localStorage.setItem("id_curso", String(idCurso));
-        return {
-          ...curso,
-          id: idCurso,
-          id_curso: curso?.id_curso ?? idCurso
-        };
+        return { ...curso, id: idCurso, id_curso: curso?.id_curso ?? idCurso };
       }
     } catch (error) {
       console.warn("No se pudo leer cursoSeleccionado desde localStorage.", error);
@@ -287,10 +622,7 @@ function obtenerCursoSeleccionado() {
   const idCurso = localStorage.getItem("id_curso");
   if (!idCurso) return null;
 
-  return {
-    id: idCurso,
-    id_curso: idCurso
-  };
+  return { id: idCurso, id_curso: idCurso };
 }
 
 function persistirCursoSeleccionado(curso) {
@@ -326,16 +658,11 @@ function escaparHtml(valor) {
 }
 
 async function completarMateriasConProfesores(materias) {
-  if (!Array.isArray(materias) || !materias.length) {
-    return [];
-  }
+  if (!Array.isArray(materias) || !materias.length) return [];
 
-  const faltanProfesores = materias.some((materia) => !Array.isArray(materia?.profesores));
+  const faltanProfesores = materias.some((m) => !Array.isArray(m?.profesores));
   if (!faltanProfesores) {
-    return materias.map((materia) => ({
-      ...materia,
-      profesores: Array.isArray(materia?.profesores) ? materia.profesores : []
-    }));
+    return materias.map((m) => ({ ...m, profesores: Array.isArray(m?.profesores) ? m.profesores : [] }));
   }
 
   try {
@@ -344,87 +671,56 @@ async function completarMateriasConProfesores(materias) {
       headers: { "Content-Type": "application/json" }
     });
 
-    if (!response.ok) {
-      throw new Error(`Respuesta ${response.status}`);
-    }
+    if (!response.ok) throw new Error(`Respuesta ${response.status}`);
 
     const data = await response.json();
     const materiasPorId = new Map(
-      (Array.isArray(data) ? data : []).map((materia) => [String(materia.id_materia), materia])
+      (Array.isArray(data) ? data : []).map((m) => [String(m.id_materia), m])
     );
 
-    return materias.map((materia) => {
-      const materiaConProfesores = materiasPorId.get(String(materia.id_materia));
-
+    return materias.map((m) => {
+      const mConProfesores = materiasPorId.get(String(m.id_materia));
       return {
-        ...materia,
-        profesores: Array.isArray(materiaConProfesores?.profesores)
-          ? materiaConProfesores.profesores
-          : Array.isArray(materia?.profesores)
-            ? materia.profesores
-            : []
+        ...m,
+        profesores: Array.isArray(mConProfesores?.profesores)
+          ? mConProfesores.profesores
+          : Array.isArray(m?.profesores) ? m.profesores : []
       };
     });
   } catch (error) {
-    console.error("No se pudieron completar los profesores de las materias.", error);
-    return materias.map((materia) => ({
-      ...materia,
-      profesores: Array.isArray(materia?.profesores) ? materia.profesores : []
-    }));
+    console.error("No se pudieron completar los profesores.", error);
+    return materias.map((m) => ({ ...m, profesores: Array.isArray(m?.profesores) ? m.profesores : [] }));
   }
 }
 
 function normalizarProfesor(profesor) {
-  if (!profesor || typeof profesor !== "object") {
-    return null;
-  }
+  if (!profesor || typeof profesor !== "object") return null;
 
   const idProfesor = profesor.id_profesor ?? profesor.id ?? profesor.profesorId ?? null;
-  const nombre = String(
-    profesor.nombre ?? profesor.nombre_profesor ?? profesor.nombre_materia ?? ""
-  ).trim();
+  const nombre = String(profesor.nombre ?? profesor.nombre_profesor ?? profesor.nombre_materia ?? "").trim();
   const apellido = String(profesor.apellido ?? "").trim();
-  const rolProfesor = String(
-    profesor.rol_profesor ?? profesor.rolProfesor ?? profesor.rol ?? ""
-  ).trim() || "Titular";
+  const rolProfesor = String(profesor.rol_profesor ?? profesor.rolProfesor ?? profesor.rol ?? "").trim() || "Titular";
 
-  if (!idProfesor && !nombre && !apellido) {
-    return null;
-  }
+  if (!idProfesor && !nombre && !apellido) return null;
 
-  return {
-    id_profesor: idProfesor,
-    nombre,
-    apellido,
-    rol_profesor: rolProfesor
-  };
+  return { id_profesor: idProfesor, nombre, apellido, rol_profesor: rolProfesor };
 }
 
 function obtenerNombreProfesorCompleto(profesor) {
   const partes = [profesor?.nombre, profesor?.apellido]
-    .map((valor) => String(valor || "").trim())
+    .map((v) => String(v || "").trim())
     .filter(Boolean);
-
   return partes.length ? partes.join(" ") : "Profesor sin nombre";
 }
 
 function obtenerProfesoresMateria(materia) {
-  if (!Array.isArray(materia?.profesores)) {
-    return [];
-  }
-
-  return materia.profesores
-    .map(normalizarProfesor)
-    .filter(Boolean)
-    .slice(0, 2);
+  if (!Array.isArray(materia?.profesores)) return [];
+  return materia.profesores.map(normalizarProfesor).filter(Boolean).slice(0, 2);
 }
 
 function obtenerResumenProfesores(materia) {
   const profesores = obtenerProfesoresMateria(materia);
-  if (!profesores.length) {
-    return "Sin asignar";
-  }
-
+  if (!profesores.length) return "Sin asignar";
   return profesores.map(obtenerNombreProfesorCompleto).join(" / ");
 }
 
@@ -437,21 +733,19 @@ function renderProfesoresMateria(materia) {
   const profesores = obtenerProfesoresMateria(materia);
 
   if (!profesores.length) {
-    return `
-      <p><span class="font-medium">Profesores:</span> Sin asignar</p>
-    `;
+    return `<p><span class="font-medium">Profesores:</span> Sin asignar</p>`;
   }
 
   return `
     <div>
       <p class="font-medium text-gray-700">Profesores</p>
       <div class="mt-2 space-y-2">
-        ${profesores.map((profesor) => `
+        ${profesores.map((p) => `
           <div class="rounded-md bg-slate-50 px-3 py-2">
-            <p class="font-medium text-slate-700">${escaparHtml(obtenerNombreProfesorCompleto(profesor))}</p>
+            <p class="font-medium text-slate-700">${escaparHtml(obtenerNombreProfesorCompleto(p))}</p>
             <p class="mt-1 flex items-center gap-2">
               <span class="text-gray-500">Rol:</span>
-              ${renderRolBadge(profesor.rol_profesor || "Sin rol")}
+              ${renderRolBadge(p.rol_profesor || "Sin rol")}
             </p>
           </div>
         `).join("")}
@@ -464,12 +758,7 @@ function actualizarEstadoProfesoresMateria(mensaje, tipo = "info") {
   const estado = document.getElementById("materiaProfesoresEstado");
   if (!estado) return;
 
-  const estilos = {
-    info: "text-slate-500",
-    success: "text-green-700",
-    error: "text-red-700"
-  };
-
+  const estilos = { info: "text-slate-500", success: "text-green-700", error: "text-red-700" };
   estado.className = `mt-1 text-xs ${estilos[tipo] || estilos.info}`;
   estado.textContent = mensaje;
 }
@@ -477,7 +766,6 @@ function actualizarEstadoProfesoresMateria(mensaje, tipo = "info") {
 function mostrarSegundoProfesor() {
   const bloque = document.getElementById("bloqueProfesor2");
   const botonAgregar = document.getElementById("btnAgregarSegundoProfesor");
-
   if (bloque) bloque.classList.remove("hidden");
   if (botonAgregar) botonAgregar.classList.add("hidden");
 }
@@ -499,23 +787,18 @@ function renderProfesoresSelects(profesores, seleccionados = []) {
 
   seleccionados
     .map(normalizarProfesor)
-    .filter((profesor) => profesor?.id_profesor)
-    .forEach((profesor) => {
-      const yaExiste = profesoresDisponibles.some(
-        (disponible) => String(disponible.id_profesor) === String(profesor.id_profesor)
-      );
-
-      if (!yaExiste) {
-        profesoresDisponibles.push(profesor);
-      }
+    .filter((p) => p?.id_profesor)
+    .forEach((p) => {
+      const yaExiste = profesoresDisponibles.some((d) => String(d.id_profesor) === String(p.id_profesor));
+      if (!yaExiste) profesoresDisponibles.push(p);
     });
 
-  const configuraciones = [
+  const configs = [
     { selectId: "materiaProfesor1", seleccionado: seleccionados[0]?.id_profesor ?? "" },
     { selectId: "materiaProfesor2", seleccionado: seleccionados[1]?.id_profesor ?? "" }
   ];
 
-  configuraciones.forEach(({ selectId, seleccionado }) => {
+  configs.forEach(({ selectId, seleccionado }) => {
     const select = document.getElementById(selectId);
     if (!select) return;
 
@@ -526,19 +809,15 @@ function renderProfesoresSelects(profesores, seleccionados = []) {
     placeholder.textContent = "Sin asignar";
     select.appendChild(placeholder);
 
-    profesoresDisponibles.forEach((profesor) => {
+    profesoresDisponibles.forEach((p) => {
       const option = document.createElement("option");
-      option.value = String(profesor.id_profesor);
-      option.textContent = obtenerNombreProfesorCompleto(profesor);
+      option.value = String(p.id_profesor);
+      option.textContent = obtenerNombreProfesorCompleto(p);
       select.appendChild(option);
     });
 
     select.value = String(seleccionado || "");
   });
-}
-
-async function obtenerProfesoresDesdeEndpoint(url) {
-  return fetchWithAuth(url);
 }
 
 async function cargarProfesoresDisponibles(force = false) {
@@ -551,26 +830,20 @@ async function cargarProfesoresDisponibles(force = false) {
   actualizarEstadoProfesoresMateria("Consultando profesores disponibles...", "info");
 
   try {
-    const response = await obtenerProfesoresDesdeEndpoint("/profesores");
+    const response = await fetchWithAuth("/profesores");
 
-    if (!response.ok) {
-      throw new Error(`Respuesta ${response.status}`);
-    }
+    if (!response.ok) throw new Error(`Respuesta ${response.status}`);
 
     const data = await response.json();
     const profesores = Array.isArray(data)
-      ? data
-          .map(normalizarProfesor)
-          .filter(Boolean)
+      ? data.map(normalizarProfesor).filter(Boolean)
           .sort((a, b) => obtenerNombreProfesorCompleto(a).localeCompare(obtenerNombreProfesorCompleto(b)))
       : [];
 
     profesoresCache = profesores;
     renderProfesoresSelects(profesoresCache);
     actualizarEstadoProfesoresMateria(
-      profesoresCache.length
-        ? "Profesores cargados correctamente."
-        : "No hay profesores disponibles para seleccionar.",
+      profesoresCache.length ? "Profesores cargados correctamente." : "No hay profesores disponibles.",
       profesoresCache.length ? "success" : "info"
     );
     return profesoresCache;
@@ -586,25 +859,18 @@ async function cargarProfesoresDisponibles(force = false) {
 }
 
 function construirProfesoresSeleccionados() {
-  const configuraciones = [
+  const configs = [
     { selectId: "materiaProfesor1", rolId: "materiaRol1" },
     { selectId: "materiaProfesor2", rolId: "materiaRol2" }
   ];
 
-  const profesores = configuraciones
+  const profesores = configs
     .map(({ selectId, rolId }) => {
       const select = document.getElementById(selectId);
       const rol = document.getElementById(rolId);
       const profesorId = select?.value ? Number(select.value) : null;
-
-      if (!profesorId) {
-        return null;
-      }
-
-      return {
-        profesorId,
-        rolProfesor: rol?.value || "Titular"
-      };
+      if (!profesorId) return null;
+      return { profesorId, rolProfesor: rol?.value || "Titular" };
     })
     .filter(Boolean);
 
@@ -638,7 +904,7 @@ function renderMaterias(materias) {
     materiasOrdenadas.sort((a, b) => (a.nombre_materia || "").localeCompare(b.nombre_materia || ""));
   }
 
-  const cards = materiasOrdenadas.map(materia => {
+  contenedor.innerHTML = materiasOrdenadas.map((materia) => {
     const materiaId = String(materia.id_materia);
     return `
       <div class="bg-white border rounded-lg p-4 hover:shadow transition">
@@ -653,74 +919,57 @@ function renderMaterias(materias) {
       </div>
     `;
   }).join("");
-
-  contenedor.innerHTML = cards;
 }
 
 function renderRolBadge(rol) {
   const rolLower = (rol || "").toLowerCase();
   let classes = "bg-gray-100 text-gray-700";
-
-  if (rolLower.includes("titular")) {
-    classes = "bg-blue-100 text-blue-700";
-  } else if (rolLower.includes("suplente")) {
-    classes = "bg-yellow-100 text-yellow-800";
-  }
-
+  if (rolLower.includes("titular")) classes = "bg-blue-100 text-blue-700";
+  else if (rolLower.includes("suplente")) classes = "bg-yellow-100 text-yellow-800";
   return `<span class="${classes} text-xs px-2 py-1 rounded">${escaparHtml(rol || "Sin rol")}</span>`;
 }
 
 function mostrarContenido() {
-  const cursoContenido = document.getElementById("cursoContenido");
-  if (cursoContenido) cursoContenido.classList.remove("hidden");
+  const el = document.getElementById("cursoContenido");
+  if (el) el.classList.remove("hidden");
 }
 
 function mostrarSkeleton() {
-  const cursoSkeleton = document.getElementById("cursoSkeleton");
-  const cursoContenido = document.getElementById("cursoContenido");
-  if (cursoContenido) cursoContenido.classList.add("hidden");
-  if (cursoSkeleton) cursoSkeleton.classList.remove("hidden");
+  const skeleton = document.getElementById("cursoSkeleton");
+  const contenido = document.getElementById("cursoContenido");
+  if (contenido) contenido.classList.add("hidden");
+  if (skeleton) skeleton.classList.remove("hidden");
 }
 
 function ocultarSkeleton() {
-  const cursoSkeleton = document.getElementById("cursoSkeleton");
-  if (cursoSkeleton) cursoSkeleton.classList.add("hidden");
+  const skeleton = document.getElementById("cursoSkeleton");
+  if (skeleton) skeleton.classList.add("hidden");
 }
 
 function mostrarError(mensaje) {
-  const cursoError = document.getElementById("cursoError");
-  if (cursoError) {
-    cursoError.textContent = mensaje;
-    cursoError.classList.remove("hidden");
-  }
+  const el = document.getElementById("cursoError");
+  if (el) { el.textContent = mensaje; el.classList.remove("hidden"); }
 }
 
 function ocultarError() {
-  const cursoError = document.getElementById("cursoError");
-  if (cursoError) cursoError.classList.add("hidden");
+  const el = document.getElementById("cursoError");
+  if (el) el.classList.add("hidden");
 }
 
 async function abrirEditarCurso() {
   if (!cursoActual) return;
   await cargarPlanes();
-  const cursoAnio = document.getElementById("cursoAnio");
-  const cursoDivision = document.getElementById("cursoDivision");
-  const cursoAnioLectivo = document.getElementById("cursoAnioLectivo");
-  const cursoPlan = document.getElementById("cursoPlan");
 
-  if (cursoAnio) cursoAnio.value = cursoActual.anio || "";
-  if (cursoDivision) cursoDivision.value = cursoActual.division || "";
-  if (cursoAnioLectivo) cursoAnioLectivo.value = cursoActual.anio_lectivo || "";
-  if (cursoPlan) cursoPlan.value = cursoActual.id_plan || "";
+  document.getElementById("cursoAnio").value = cursoActual.anio || "";
+  document.getElementById("cursoDivision").value = cursoActual.division || "";
+  document.getElementById("cursoAnioLectivo").value = cursoActual.anio_lectivo || "";
+  document.getElementById("cursoPlan").value = cursoActual.id_plan || "";
 
   mostrarModal("modalCurso");
 }
 
 async function cargarPlanes() {
-  if (planesCache) {
-    renderPlanesSelect(planesCache);
-    return;
-  }
+  if (planesCache) { renderPlanesSelect(planesCache); return; }
   try {
     const res = await fetchWithAuth("/planes");
     const data = await res.json();
@@ -739,7 +988,7 @@ function renderPlanesSelect(planes) {
   placeholder.value = "";
   placeholder.textContent = "Seleccione un plan";
   cursoPlan.appendChild(placeholder);
-  planes.forEach(plan => {
+  planes.forEach((plan) => {
     const option = document.createElement("option");
     option.value = plan.id_plan;
     option.textContent = plan.nombre_plan;
@@ -760,19 +1009,11 @@ async function actualizarCurso(event) {
     const res = await fetchWithAuth(`/cursos/${cursoActual.id_curso}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        anio,
-        division,
-        id_plan: idPlan,
-        anio_lectivo: anioLectivo
-      })
+      body: JSON.stringify({ anio, division, id_plan: idPlan, anio_lectivo: anioLectivo })
     });
 
     const data = await res.json();
-    if (!res.ok) {
-      alert(data.error || "No se pudo actualizar el curso.");
-      return;
-    }
+    if (!res.ok) { alert(data.error || "No se pudo actualizar el curso."); return; }
 
     ocultarModal("modalCurso");
     cargarCurso(cursoActual.id_curso);
@@ -784,18 +1025,13 @@ async function actualizarCurso(event) {
 
 async function eliminarCurso() {
   if (!cursoActual) return;
-  const confirmar = confirm("¿Eliminar el curso? Esta acción no se puede deshacer.");
-  if (!confirmar) return;
+  if (!confirm("¿Eliminar el curso? Esta acción no se puede deshacer.")) return;
 
   try {
-    const res = await fetchWithAuth(`/cursos/${cursoActual.id_curso}`, {
-      method: "DELETE"
-    });
+    const res = await fetchWithAuth(`/cursos/${cursoActual.id_curso}`, { method: "DELETE" });
     const data = await res.json();
-    if (!res.ok) {
-      alert(data.error || "No se pudo eliminar el curso.");
-      return;
-    }
+    if (!res.ok) { alert(data.error || "No se pudo eliminar el curso."); return; }
+
     limpiarCursoSeleccionado();
     if (window.top && typeof window.top.cargarVista === "function") {
       window.top.cargarVista("cursos/cursos_general.html");
@@ -809,38 +1045,31 @@ async function eliminarCurso() {
 }
 
 async function abrirEditarMateria(idMateria) {
-  const materia = materiasCache.find(m => String(m.id_materia) === String(idMateria));
+  const materia = materiasCache.find((m) => String(m.id_materia) === String(idMateria));
   if (!materia) return;
 
   const profesoresMateria = obtenerProfesoresMateria(materia);
-  await cargarProfesoresDisponibles().catch((error) => {
-    console.error(error);
-  });
+  await cargarProfesoresDisponibles().catch(console.error);
 
   modoMateria = "editar";
-  const titulo = document.getElementById("tituloModalMateria");
-  if (titulo) titulo.textContent = "Actualizar materia";
+  document.getElementById("tituloModalMateria").textContent = "Actualizar materia";
   document.getElementById("materiaId").value = materia.id_materia;
   document.getElementById("materiaNombre").value = materia.nombre_materia || "";
   renderProfesoresSelects(profesoresCache, profesoresMateria);
   document.getElementById("materiaRol1").value = profesoresMateria[0]?.rol_profesor || "Titular";
   document.getElementById("materiaRol2").value = profesoresMateria[1]?.rol_profesor || "Titular";
-  if (profesoresMateria[1]) {
-    mostrarSegundoProfesor();
-  } else {
-    ocultarSegundoProfesor();
-  }
+
+  if (profesoresMateria[1]) mostrarSegundoProfesor();
+  else ocultarSegundoProfesor();
+
   mostrarModal("modalMateria");
 }
 
 async function abrirCrearMateria() {
-  await cargarProfesoresDisponibles().catch((error) => {
-    console.error(error);
-  });
+  await cargarProfesoresDisponibles().catch(console.error);
 
   modoMateria = "crear";
-  const titulo = document.getElementById("tituloModalMateria");
-  if (titulo) titulo.textContent = "Agregar materia";
+  document.getElementById("tituloModalMateria").textContent = "Agregar materia";
   document.getElementById("materiaId").value = "";
   document.getElementById("materiaNombre").value = "";
   renderProfesoresSelects(profesoresCache);
@@ -863,39 +1092,31 @@ async function guardarMateria(event) {
   }
 
   const payload = {
-    materia: {
-      nombre_materia: nombre,
-      idCurso: cursoActual?.id_curso
-    },
+    materia: { nombre_materia: nombre, idCurso: cursoActual?.id_curso },
     profesores
   };
 
   try {
+    let res;
     if (modoMateria === "crear") {
-      const res = await fetchWithAuth(`/materias`, {
+      res = await fetchWithAuth("/materias", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload)
       });
-      const data = await res.json();
-      if (!res.ok) {
-        alert(data.error || "No se pudo crear la materia.");
-        return;
-      }
     } else {
       const idMateria = document.getElementById("materiaId").value;
       if (!idMateria) return;
-      const res = await fetchWithAuth(`/materias/${idMateria}`, {
+      res = await fetchWithAuth(`/materias/${idMateria}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload)
       });
-      const data = await res.json();
-      if (!res.ok) {
-        alert(data.error || "No se pudo actualizar la materia.");
-        return;
-      }
     }
+
+    const data = await res.json();
+    if (!res.ok) { alert(data.error || "No se pudo guardar la materia."); return; }
+
     ocultarModal("modalMateria");
     cargarCurso(cursoActual.id_curso);
   } catch (error) {
@@ -905,18 +1126,12 @@ async function guardarMateria(event) {
 }
 
 async function eliminarMateria(idMateria) {
-  const confirmar = confirm("¿Eliminar la materia? Esta acción no se puede deshacer.");
-  if (!confirmar) return;
+  if (!confirm("¿Eliminar la materia? Esta acción no se puede deshacer.")) return;
 
   try {
-    const res = await fetchWithAuth(`/materias/${idMateria}`, {
-      method: "DELETE"
-    });
+    const res = await fetchWithAuth(`/materias/${idMateria}`, { method: "DELETE" });
     const data = await res.json();
-    if (!res.ok) {
-      alert(data.error || "No se pudo eliminar la materia.");
-      return;
-    }
+    if (!res.ok) { alert(data.error || "No se pudo eliminar la materia."); return; }
     cargarCurso(cursoActual.id_curso);
   } catch (error) {
     console.error(error);
@@ -926,12 +1141,10 @@ async function eliminarMateria(idMateria) {
 
 function mostrarModal(id) {
   const modal = document.getElementById(id);
-  if (modal) modal.classList.remove("hidden");
-  if (modal) modal.classList.add("flex");
+  if (modal) { modal.classList.remove("hidden"); modal.classList.add("flex"); }
 }
 
 function ocultarModal(id) {
   const modal = document.getElementById(id);
-  if (modal) modal.classList.add("hidden");
-  if (modal) modal.classList.remove("flex");
+  if (modal) { modal.classList.add("hidden"); modal.classList.remove("flex"); }
 }

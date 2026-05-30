@@ -1,6 +1,6 @@
 const db = require('../dbDatos');
 
-cursoIndividual = async (id) => {
+async function cursoIndividual(id) {
   const { rows } = await db.query(`
     SELECT 
       c.*,
@@ -15,33 +15,31 @@ cursoIndividual = async (id) => {
 }
 
 async function materiasPorCurso(idCurso) {
-const result = await db.query(
-      `SELECT *
-       FROM materia
-       WHERE id_curso = $1`,
-      [idCurso]
-    );
-    return result.rows;
+  const result = await db.query(
+    `SELECT *
+     FROM materia
+     WHERE id_curso = $1`,
+    [idCurso]
+  );
+  return result.rows;
 }
 
 async function obternerCursos() {
-
-  const result =  db.query(`
-      SELECT 
-        c.*, p.id_plan, p.nombre_plan AS nombre_plan, p.descripcion AS plan_descripcion
-      FROM curso c
-      LEFT JOIN plan p ON c.id_plan = p.id_plan
-      ORDER BY c.id_curso ASC;
-    `);
-  
-    return result;
-
+  const result = db.query(`
+    SELECT 
+      c.*, p.id_plan, p.nombre_plan AS nombre_plan, p.descripcion AS plan_descripcion
+    FROM curso c
+    LEFT JOIN plan p ON c.id_plan = p.id_plan
+    ORDER BY c.id_curso ASC;
+  `);
+  return result;
 }
 
 async function crearCurso(anio, division, id_plan, anio_lectivo) {
-
-  const { rows } = await db.query(`INSERT INTO curso (anio, division, id_plan, anio_lectivo) VALUES ($1, $2, $3, $4) RETURNING *`,
-    [anio, division, id_plan, anio_lectivo]);
+  const { rows } = await db.query(
+    `INSERT INTO curso (anio, division, id_plan, anio_lectivo) VALUES ($1, $2, $3, $4) RETURNING *`,
+    [anio, division, id_plan, anio_lectivo]
+  );
   return rows[0];
 }
 
@@ -55,34 +53,32 @@ async function alumnosPorCurso(idCurso) {
     WHERE c.id_curso = $1
     ORDER BY a.apellido NULLS LAST, a.nombre NULLS LAST;
   `, [idCurso]);
-
   return rows;
 }
+
 async function findCursoExistente(anioLectivo, anio, division) {
-
   return db.query(`
-     SELECT EXISTS (
-       SELECT 1
-       FROM curso
-       WHERE anio_lectivo = $1
-       AND anio = $2
-       AND division = $3
-       );
-    `, [anioLectivo, anio, division]);
-
+    SELECT EXISTS (
+      SELECT 1
+      FROM curso
+      WHERE anio_lectivo = $1
+      AND anio = $2
+      AND division = $3
+    );
+  `, [anioLectivo, anio, division]);
 }
 
 async function cursoDuplicado(anioLectivo, anio, division, idCurso) {
   const { rows } = await db.query(`
-     SELECT EXISTS (
-       SELECT 1
-       FROM curso
-       WHERE anio_lectivo = $1
-       AND anio = $2
-       AND division = $3
-       AND id_curso <> $4
-       );
-    `, [anioLectivo, anio, division, idCurso]);
+    SELECT EXISTS (
+      SELECT 1
+      FROM curso
+      WHERE anio_lectivo = $1
+      AND anio = $2
+      AND division = $3
+      AND id_curso <> $4
+    );
+  `, [anioLectivo, anio, division, idCurso]);
   return rows[0].exists;
 }
 
@@ -117,17 +113,16 @@ async function eliminarCurso(idCurso) {
   return rows[0];
 }
 
-asignarCurso = async (idAlumno, idCurso) => {
+async function asignarCurso(idAlumno, idCurso) {
   const result = await db.query(`
     INSERT INTO alumno_curso (id_alumno, id_curso)
     VALUES ($1, $2)
     RETURNING *;
   `, [idAlumno, idCurso]);
-
   return result.rows[0];
 }
 
-alumnoYaAsignado = async (idAlumno, idCurso) => {
+async function alumnoYaAsignado(idAlumno) {
   return db.query(`
     SELECT EXISTS (
       SELECT 1
@@ -137,13 +132,52 @@ alumnoYaAsignado = async (idAlumno, idCurso) => {
   `, [idAlumno]);
 }
 
-cursoDeAlumno = async (idAlumno) => {
+async function cursoDeAlumno(idAlumno) {
   return db.query(`
     SELECT c.*
     FROM curso c
     JOIN alumno_curso ac ON ac.id_curso = c.id_curso
     WHERE ac.id_alumno = $1
   `, [idAlumno]);
+}
+
+// ════════════════════════════════════════════════════════════════
+// Alumnos sin curso — lista completa (tab masiva)
+// ════════════════════════════════════════════════════════════════
+async function alumnosSinCurso() {
+  const { rows } = await db.query(`
+    SELECT a.id_alumno, a.legajo, a.nombre, a.apellido, a.dni
+    FROM alumno a
+    WHERE NOT EXISTS (
+      SELECT 1 FROM alumno_curso ac WHERE ac.id_alumno = a.id_alumno
+    )
+    ORDER BY a.apellido ASC, a.nombre ASC
+  `);
+  return rows;
+}
+
+// ════════════════════════════════════════════════════════════════
+// Buscar alumnos sin curso por término (tab manual)
+// Nombre unificado: buscarAlumnosSinCurso (con "s")
+// ════════════════════════════════════════════════════════════════
+async function buscarAlumnosSinCurso(termino) {
+  const busqueda = `%${termino}%`;
+  const { rows } = await db.query(`
+    SELECT a.id_alumno, a.legajo, a.nombre, a.apellido, a.dni
+    FROM alumno a
+    WHERE NOT EXISTS (
+      SELECT 1 FROM alumno_curso ac WHERE ac.id_alumno = a.id_alumno
+    )
+    AND (
+      a.dni::text ILIKE $1
+      OR a.legajo::text ILIKE $1
+      OR a.nombre ILIKE $1
+      OR a.apellido ILIKE $1
+    )
+    ORDER BY a.apellido ASC, a.nombre ASC
+    LIMIT 20
+  `, [busqueda]);
+  return rows;
 }
 
 module.exports = {
@@ -158,5 +192,7 @@ module.exports = {
   alumnoYaAsignado,
   cursoDeAlumno,
   cursoIndividual,
-  materiasPorCurso
-}
+  materiasPorCurso,
+  alumnosSinCurso,
+  buscarAlumnosSinCurso,   // nombre unificado con "s"
+};
