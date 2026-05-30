@@ -65,7 +65,12 @@
             <h2 class="text-xl font-semibold">Alumnos del curso</h2>
             <p id="alumnosResumen" class="text-sm text-gray-500">Listado de alumnos asociados al curso seleccionado.</p>
           </div>
-          <span id="alumnosCount" class="inline-flex w-fit items-center rounded-full bg-slate-100 px-3 py-1 text-sm font-medium text-slate-600">0 alumnos</span>
+          <div class="flex items-center gap-2">
+            <span id="alumnosCount" class="inline-flex w-fit items-center rounded-full bg-slate-100 px-3 py-1 text-sm font-medium text-slate-600">0 alumnos</span>
+            <button id="btnAsignarAlumnos" class="bg-green-600 hover:bg-green-700 text-white px-3 py-2 rounded-lg text-sm">
+              Asignar alumnos
+            </button>
+          </div>
         </div>
 
         <p id="alumnosEstado" class="mt-4 rounded-lg border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-600">Cargando alumnos...</p>
@@ -210,6 +215,71 @@
           <button type="submit" class="px-3 py-2 rounded-md bg-blue-600 text-white">Guardar</button>
         </div>
       </form>
+    </div>
+  </div>
+
+  <!-- Modal asignar alumnos -->
+  <div id="modalAsignarAlumnos" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/40 p-4">
+    <div class="w-full max-w-2xl rounded-xl bg-white shadow-lg flex flex-col max-h-[90vh]">
+      
+      <!-- Header -->
+      <div class="flex items-center justify-between p-6 border-b">
+        <h3 class="text-lg font-semibold">Asignar alumnos al curso</h3>
+        <button id="btnCerrarAsignarAlumnos" class="text-gray-400 hover:text-gray-600 text-xl font-bold">&times;</button>
+      </div>
+
+      <!-- Tabs -->
+      <div class="flex border-b px-6">
+        <button id="tabManual" class="tab-asignar px-4 py-3 text-sm font-medium border-b-2 border-blue-600 text-blue-600" data-tab="manual">
+          Manual
+        </button>
+        <button id="tabMasiva" class="tab-asignar px-4 py-3 text-sm font-medium border-b-2 border-transparent text-gray-500 hover:text-gray-700" data-tab="masiva">
+          Masiva
+        </button>
+      </div>
+
+      <!-- Tab Manual -->
+      <div id="panelManual" class="p-6 flex flex-col gap-4 overflow-y-auto">
+        <p class="text-sm text-gray-600">Buscá un alumno por nombre, apellido, DNI o legajo. Solo se muestran alumnos sin curso asignado.</p>
+        <div class="flex gap-2">
+          <input id="inputBuscarAlumno" type="text" placeholder="Nombre, apellido, DNI o legajo..."
+            class="flex-1 border rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-300">
+          <button id="btnBuscarAlumno" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm">Buscar</button>
+        </div>
+        <div id="resultadosBusqueda" class="space-y-2"></div>
+        <div id="feedbackManual" class="hidden rounded-lg px-4 py-3 text-sm"></div>
+      </div>
+
+      <!-- Tab Masiva -->
+      <div id="panelMasiva" class="hidden p-6 flex flex-col gap-4 overflow-y-auto">
+        <p class="text-sm text-gray-600">Seleccioná los alumnos que querés asignar a este curso. Solo se muestran alumnos sin curso asignado.</p>
+        
+        <div class="flex items-center justify-between">
+          <label class="flex items-center gap-2 text-sm font-medium cursor-pointer">
+            <input id="checkTodos" type="checkbox" class="w-4 h-4">
+            Seleccionar todos
+          </label>
+          <span id="countSeleccionados" class="text-sm text-gray-500">0 seleccionados</span>
+        </div>
+
+        <div id="estadoMasiva" class="rounded-lg border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-600">
+          Cargando alumnos...
+        </div>
+
+        <div id="listaMasivaWrapper" class="hidden overflow-y-auto max-h-64 border rounded-lg divide-y">
+          <!-- Filas dinámicas -->
+        </div>
+
+        <div id="feedbackMasiva" class="hidden rounded-lg px-4 py-3 text-sm"></div>
+
+        <div class="flex justify-end pt-2">
+          <button id="btnAsignarMasivo" disabled
+            class="bg-green-600 hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed text-white px-4 py-2 rounded-md text-sm font-medium">
+            Asignar seleccionados (0)
+          </button>
+        </div>
+      </div>
+
     </div>
   </div>
 

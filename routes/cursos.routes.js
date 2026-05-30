@@ -3,12 +3,15 @@ const router = express.Router();
 const controller = require('../controller/cursos.controller.js');
 
 router.get('/', controller.obtenerCursos);
+router.get('/alumnos-sin-curso', controller.alumnosSinCurso);
+router.get('/alumnos-sin-curso/buscar', controller.buscarAlumnoSinCurso);
 router.get('/:id/alumnos', controller.alumnosPorCursos);
 router.get('/:id', controller.cursoIndividual);
 router.put('/:id', controller.actualizarCurso);
 router.delete('/:id', controller.eliminarCurso);
 router.post('/', controller.crearCursos);
 router.post('/asignar-curso', controller.asignarCurso);
+router.post('/asignar-masivo', controller.asignarCursoMasivo);
 
 router.get('/cursos/:idCurso', controller.materiasPorCurso);
 
