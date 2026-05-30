@@ -77,11 +77,34 @@ asignarCurso = async (idAlumno, idCurso) => {
     return "Curso asignado correctamente";
 }
 
+async function alumnosSinCurso() {
+    return await repo.alumnosSinCurso();
+}
+
+async function buscarAlumnoSinCurso(termino) {
+    if (!termino || termino.trim().length < 2) {
+        throw new Error('El término de búsqueda debe tener al menos 2 caracteres');
+    }
+    return await repo.buscarAlumnoSinCurso(termino.trim());
+}
+
+async function asignarCursoMasivo(idAlumnos, idCurso) {
+    if (!Array.isArray(idAlumnos) || idAlumnos.length === 0) {
+        throw new Error('Debe seleccionar al menos un alumno');
+    }
+    const curso = await repo.cursoIndividual(idCurso);
+    if (!curso) throw new Error('Curso no encontrado');
+    return await repo.asignarCursoMasivo(idAlumnos, idCurso);
+}
+
 module.exports = {
     obtenerCursos,
     crearCurso,
     alumnosPorCurso,
     asignarCurso,
+    asignarCursoMasivo,
+    alumnosSinCurso,
+    buscarAlumnoSinCurso,
     cursoIndividual,
     actualizarCurso,
     eliminarCurso

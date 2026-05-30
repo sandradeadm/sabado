@@ -119,11 +119,45 @@ asignarCurso = async (req, res) => {
 
 }
 
+async function alumnosSinCurso(req, res) {
+  try {
+    const result = await services.alumnosSinCurso();
+    res.json(result);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: error.message });
+  }
+}
+
+async function buscarAlumnoSinCurso(req, res) {
+  const { q } = req.query;
+  try {
+    const result = await services.buscarAlumnoSinCurso(q);
+    res.json(result);
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+}
+
+async function asignarCursoMasivo(req, res) {
+  const { idAlumnos, idCurso } = req.body;
+  try {
+    const result = await services.asignarCursoMasivo(idAlumnos, idCurso);
+    res.json({ mensaje: `${result.length} alumno(s) asignado(s) correctamente`, asignados: result.length });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: error.message });
+  }
+}
+
 module.exports = {
   alumnosPorCursos,
   obtenerCursos,
   crearCursos,
   asignarCurso,
+  asignarCursoMasivo,
+  alumnosSinCurso,
+  buscarAlumnoSinCurso,
   cursoIndividual,
   materiasPorCurso,
   actualizarCurso,

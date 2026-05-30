@@ -137,6 +137,60 @@ alumnoYaAsignado = async (idAlumno, idCurso) => {
   `, [idAlumno]);
 }
 
+async function alumnosSinCurso() {
+  const { rows } = await db.query(`
+    SELECT a.id_alumno, a.legajo, a.nombre, a.apellido, a.dni
+    FROM alumno a
+    WHERE NOT EXISTS (
+      SELECT 1 FROM alumno_curso ac WHERE ac.id_alumno = a.id_alumno
+    )
+    ORDER BY a.apellido ASC, a.nombre ASC
+  `);
+  return rows;
+}
+
+async function buscarAlumnoSinCurso(termino) {
+  const busqueda = `%${termino}%`;
+  const { rows } = await db.query(`
+    SELECT a.id_alumno, a.legajo, a.nombre, a.apellido, a.dni
+    FROM alumno a
+    WHERE NOT EXISTS (
+      SELECT 1 FROM alumno_curso ac WHERE ac.id_alumno = a.id_alumno
+    )
+    AND (
+      a.dni ILIKE $1 OR a.legajo::text ILIKE $1
+      OR a.nombre ILIKE $1 OR a.apellido ILIKE $1
+    )
+    ORDER BY a.apellido ASC, a.nombre ASC
+    LIMIT 10
+  `, [busqueda]);
+  return rows;
+}
+
+async function asignarCursoMasivo(idAlumnos, idCurso) {
+  const client = await db.connect();
+  try {
+    await client.query('BEGIN');
+    const resultados = [];
+    for (const idAlumno of idAlumnos) {
+      const { rows } = await client.query(`
+        INSERT INTO alumno_curso (id_alumno, id_curso)
+        VALUES ($1, $2)
+        ON CONFLICT DO NOTHING
+        RETURNING *
+      `, [idAlumno, idCurso]);
+      if (rows[0]) resultados.push(rows[0]);
+    }
+    await client.query('COMMIT');
+    return resultados;
+  } catch (err) {
+    await client.query('ROLLBACK');
+    throw err;
+  } finally {
+    client.release();
+  }
+}
+
 cursoDeAlumno = async (idAlumno) => {
   return db.query(`
     SELECT c.*
@@ -155,7 +209,10 @@ module.exports = {
   actualizarCurso,
   eliminarCurso,
   asignarCurso,
+  asignarCursoMasivo,
   alumnoYaAsignado,
+  alumnosSinCurso,
+  buscarAlumnoSinCurso,
   cursoDeAlumno,
   cursoIndividual,
   materiasPorCurso
