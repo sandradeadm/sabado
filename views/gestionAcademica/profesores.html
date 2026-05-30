@@ -1,0 +1,738 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profesores</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="/assets/css/base.css">
+  <link href="/css/output.css" rel="stylesheet">
+
+
+</head>
+
+<body>
+    <div id="svg-sprite" style="display:none"></div>
+
+    <div class="min-h-screen bg-gray-50">
+        <div class="space-y-6">
+            <div class="rounded-lg border bg-white p-6 shadow-sm">
+                <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+                    <div>
+                        <h1 class="text-2xl font-bold text-gray-900">Profesores</h1>
+                        <p class="mt-2 text-gray-600">Consulta y seguimiento del cuerpo docente registrado.</p>
+                    </div>
+                    <div class="flex flex-wrap items-center gap-3">
+                        <button id="descargar-plantilla-profesores" type="button"
+                            class="inline-flex items-center justify-center gap-2 rounded-md bg-slate-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-slate-500 focus:ring-offset-2">
+                            Descargar plantilla
+                        </button>
+                        <button id="importar-profesores" type="button"
+                            class="inline-flex items-center justify-center gap-2 rounded-md bg-amber-500 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-amber-600 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:ring-offset-2">
+                            Importar Excel
+                        </button>
+                        <button id="exportar-profesores" type="button"
+                            class="inline-flex items-center justify-center gap-2 rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+                            Exportar Excel
+                        </button>
+                        <button id="crear-profesor" type="button"
+                            class="inline-flex items-center justify-center gap-2 rounded-md bg-green-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2">
+                            
+                            Crear Profesor
+                        </button>
+                    </div>
+                    <input id="input-importar-profesores" type="file"
+                        accept=".xlsx,.xls,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel"
+                        class="hidden">
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 gap-4 md:grid-cols-3">
+                <div class="rounded-lg border bg-white p-5 shadow-sm">
+                    <div class="text-sm font-medium text-gray-500">Total de profesores</div>
+                    <div id="cantidad-profesores" class="mt-2 text-3xl font-bold text-blue-700">--</div>
+                </div>
+                
+            </div>
+
+            <div class="rounded-lg border bg-white shadow-sm">
+                <div class="p-6">
+                    <div id="estado-profesores"
+                        class="mb-4 rounded-lg border border-blue-200 bg-blue-50 px-4 py-3 text-sm text-blue-700">
+                        Cargando profesores...
+                    </div>
+
+                    <div class="overflow-x-auto rounded-lg border border-gray-200">
+                        <table class="w-full table-auto">
+                            <thead>
+                                <tr class="bg-gradient-to-r from-blue-600 to-blue-700 text-white">
+                                    <th class="px-4 py-3 text-left font-medium">ID</th>
+                                    <th class="px-4 py-3 text-left font-medium">Nombre</th>
+                                    <th class="px-4 py-3 text-left font-medium">Apellido</th>
+                                    <th class="px-4 py-3 text-left font-medium">Nombre completo</th>
+                                    <th class="px-4 py-3 text-left font-medium">Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tabla-profesores" class="divide-y divide-gray-200 bg-white">
+                                <tr>
+                                    <td colspan="5" class="px-4 py-6 text-center text-sm text-gray-500">
+                                        Esperando datos...
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para editar / eliminar profesor -->
+    <div id="modal-profesor" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/50 p-4">
+        <div class="w-full max-w-md rounded-lg bg-white p-6 shadow-lg">
+            <div id="modal-contenido-editar" class="space-y-3">
+                <h2 class="text-xl font-bold">Editar profesor</h2>
+                <input id="modal-nombre" type="text" class="w-full rounded border px-3 py-2" placeholder="Nombre" />
+                <input id="modal-apellido" type="text" class="w-full rounded border px-3 py-2" placeholder="Apellido" />
+                <div class="flex justify-end gap-2">
+                    <button id="modal-cancelar" class="rounded bg-gray-300 px-4 py-2 hover:bg-gray-400">Cancelar</button>
+                    <button id="modal-confirmar-editar" class="rounded bg-green-600 px-4 py-2 text-white hover:bg-green-700">Guardar</button>
+                </div>
+            </div>
+            <div id="modal-contenido-eliminar" class="hidden space-y-3">
+                <h2 class="text-xl font-bold">Eliminar profesor</h2>
+                <p id="modal-mensaje-eliminar" class="text-sm text-gray-700">¿Está seguro?</p>
+                <div class="flex justify-end gap-2">
+                    <button id="modal-cancelar-eliminar" class="rounded bg-gray-300 px-4 py-2 hover:bg-gray-400">Cancelar</button>
+                    <button id="modal-confirmar-eliminar" class="rounded bg-red-600 px-4 py-2 text-white hover:bg-red-700">Eliminar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    <script src="/services/api.js"></script>
+    <script src="/assets/js/js/pageAccess.js"></script>
+    <script>
+        fetch('/assets/icons/iconos.svg')
+            .then(res => res.text())
+            .then(data => {
+                document.getElementById('svg-sprite').innerHTML = data;
+            });
+
+        const PROFESORES_ENDPOINTS = [
+            'http://localhost:3000/profesores',
+            '/api/profesores'
+        ];
+
+        const tablaProfesores = document.getElementById('tabla-profesores');
+        const estadoProfesores = document.getElementById('estado-profesores');
+        const cantidadProfesores = document.getElementById('cantidad-profesores');
+        const botonDescargarPlantillaProfesores = document.getElementById('descargar-plantilla-profesores');
+        const botonImportarProfesores = document.getElementById('importar-profesores');
+        const inputImportarProfesores = document.getElementById('input-importar-profesores');
+        const botonExportarProfesores = document.getElementById('exportar-profesores');
+
+        function actualizarEstadoProfesores(mensaje, tipo) {
+            const estilos = {
+                info: 'border-blue-200 bg-blue-50 text-blue-700',
+                success: 'border-green-200 bg-green-50 text-green-700',
+                error: 'border-red-200 bg-red-50 text-red-700'
+            };
+
+            estadoProfesores.className = `mb-4 rounded-lg border px-4 py-3 text-sm ${estilos[tipo] || estilos.info}`;
+            estadoProfesores.textContent = mensaje;
+        }
+
+        function escaparHtml(valor) {
+            return String(valor)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;');
+        }
+
+        function ajustarAlturaIframe() {
+            requestAnimationFrame(() => {
+                const altura = Math.max(
+                    document.body.scrollHeight,
+                    document.documentElement.scrollHeight
+                );
+
+                if (window.parent && window.parent !== window) {
+                    window.parent.postMessage({ tipo: 'ajustarAltura', altura }, '*');
+                }
+            });
+        }
+
+        function obtenerNombreArchivoDesdeHeaders(response, fallbackFileName = 'profesores.xlsx') {
+            const disposition = response.headers.get('Content-Disposition') || '';
+            const matchUtf = disposition.match(/filename\*=UTF-8''([^;]+)/i);
+            if (matchUtf?.[1]) {
+                return decodeURIComponent(matchUtf[1]);
+            }
+
+            const match = disposition.match(/filename="?([^"]+)"?/i);
+            return match?.[1] || fallbackFileName;
+        }
+
+        function alternarEstadoBoton(button, disabled) {
+            if (!button) return;
+
+            button.disabled = disabled;
+            button.classList.toggle('opacity-70', disabled);
+            button.classList.toggle('cursor-not-allowed', disabled);
+        }
+
+        async function obtenerMensajeErrorResponse(response, fallbackMessage) {
+            try {
+                const contentType = response.headers.get('Content-Type') || '';
+
+                if (contentType.includes('application/json')) {
+                    const data = await response.json();
+                    if (typeof data?.error === 'string' && data.error.trim()) {
+                        return data.error.trim();
+                    }
+
+                    if (typeof data?.message === 'string' && data.message.trim()) {
+                        return data.message.trim();
+                    }
+                }
+
+                const text = (await response.text()).trim();
+                if (text) {
+                    return text;
+                }
+            } catch (error) {
+                console.error('No se pudo leer el detalle del error de importacion.', error);
+            }
+
+            return fallbackMessage;
+        }
+
+        function normalizarTextoExcel(valor) {
+            return String(valor ?? '').trim();
+        }
+
+        function normalizarCabeceraExcel(valor) {
+            return normalizarTextoExcel(valor)
+                .normalize('NFD')
+                .replace(/[\u0300-\u036f]/g, '')
+                .toLowerCase();
+        }
+
+        function validarArchivoExcel(file) {
+            if (!file) return false;
+
+            const nombre = String(file.name || '').toLowerCase();
+            return nombre.endsWith('.xlsx') || nombre.endsWith('.xls');
+        }
+
+        async function importarProfesoresDesdeEndpoint(file) {
+            const formData = new FormData();
+            formData.append('archivo', file);
+
+            const response = await fetchWithAuth('/api/profesores/import', {
+                method: 'POST',
+                body: formData
+            });
+
+            if (!response.ok) {
+                const error = new Error(
+                    await obtenerMensajeErrorResponse(response, `Respuesta ${response.status}`)
+                );
+                error.status = response.status;
+                throw error;
+            }
+
+            return response.json().catch(() => ({}));
+        }
+
+        async function leerProfesoresDesdeExcel(file) {
+            if (typeof XLSX === 'undefined') {
+                throw new Error('No se pudo cargar el lector de Excel en el navegador.');
+            }
+
+            const buffer = await file.arrayBuffer();
+            const workbook = XLSX.read(buffer, { type: 'array' });
+            const primeraHoja = workbook.SheetNames?.[0];
+
+            if (!primeraHoja) {
+                throw new Error('El archivo no contiene hojas para importar.');
+            }
+
+            const filas = XLSX.utils.sheet_to_json(workbook.Sheets[primeraHoja], {
+                header: 1,
+                defval: ''
+            });
+
+            if (!Array.isArray(filas) || !filas.length) {
+                throw new Error('El archivo esta vacio.');
+            }
+
+            const [cabeceras = [], ...filasDatos] = filas;
+            const primeraCabecera = normalizarCabeceraExcel(cabeceras[0]);
+            const segundaCabecera = normalizarCabeceraExcel(cabeceras[1]);
+
+            if (primeraCabecera !== 'nombre' || segundaCabecera !== 'apellido') {
+                throw new Error('La planilla debe tener Nombre y Apellido como primeras columnas.');
+            }
+
+            const profesores = [];
+            const filasOmitidas = [];
+
+            filasDatos.forEach((fila, index) => {
+                const numeroFila = index + 2;
+                const nombre = normalizarTextoExcel(fila?.[0]);
+                const apellido = normalizarTextoExcel(fila?.[1]);
+
+                if (!nombre && !apellido) {
+                    return;
+                }
+
+                if (!nombre || !apellido) {
+                    filasOmitidas.push(numeroFila);
+                    return;
+                }
+
+                profesores.push({
+                    nombre,
+                    apellido,
+                    numeroFila
+                });
+            });
+
+            if (!profesores.length) {
+                if (filasOmitidas.length) {
+                    throw new Error(`No hay filas completas para importar. Revise las filas ${filasOmitidas.join(', ')}.`);
+                }
+
+                throw new Error('No se encontraron profesores para importar en la planilla.');
+            }
+
+            return { profesores, filasOmitidas };
+        }
+
+        async function importarProfesoresFilaPorFila(profesores) {
+            let creados = 0;
+            const errores = [];
+
+            for (const [index, profesor] of profesores.entries()) {
+                actualizarEstadoProfesores(`Importando profesores (${index + 1}/${profesores.length})...`, 'info');
+
+                try {
+                    const response = await fetchWithAuth('/api/profesores', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            nombre: profesor.nombre,
+                            apellido: profesor.apellido
+                        })
+                    });
+
+                    if (!response.ok) {
+                        throw new Error(
+                            await obtenerMensajeErrorResponse(response, `Respuesta ${response.status}`)
+                        );
+                    }
+
+                    creados += 1;
+                } catch (error) {
+                    errores.push(`fila ${profesor.numeroFila}: ${error.message}`);
+                }
+            }
+
+            return { creados, errores };
+        }
+
+        function renderizarProfesores(profesores) {
+            if (!Array.isArray(profesores) || profesores.length === 0) {
+                tablaProfesores.innerHTML = `
+                    <tr>
+                        <td colspan="5" class="px-4 py-6 text-center text-sm text-gray-500">
+                            No hay profesores cargados.
+                        </td>
+                    </tr>
+                `;
+                cantidadProfesores.textContent = '0';
+                actualizarEstadoProfesores('No se encontraron profesores para mostrar.', 'info');
+                ajustarAlturaIframe();
+                return;
+            }
+
+            tablaProfesores.innerHTML = profesores.map((profesor) => {
+                const nombre = escaparHtml(profesor.nombre || '-');
+                const apellido = escaparHtml(profesor.apellido || '-');
+                const nombreCompleto = `${nombre} ${apellido}`.trim();
+                const idProfesor = escaparHtml(profesor.id_profesor ?? '-');
+
+                return `
+                    <tr class="hover:bg-gray-50">
+                        <td class="px-4 py-3 text-sm text-gray-700">${idProfesor}</td>
+                        <td class="px-4 py-3 text-sm text-gray-700">${nombre}</td>
+                        <td class="px-4 py-3 text-sm text-gray-700">${apellido}</td>
+                        <td class="px-4 py-3 text-sm font-medium text-gray-900">${nombreCompleto}</td>
+                        <td class="px-4 py-3 text-sm">
+                            <button class="editar-profesor inline-flex items-center justify-center gap-1 rounded bg-yellow-500 px-2 py-1 text-xs text-white hover:bg-yellow-600" data-id="${idProfesor}" data-nombre="${nombre}" data-apellido="${apellido}">
+                                Editar
+                            </button>
+                            <button class="eliminar-profesor inline-flex items-center justify-center gap-1 rounded bg-red-500 px-2 py-1 text-xs text-white hover:bg-red-600 ml-2" data-id="${idProfesor}" data-nombre="${nombre}" data-apellido="${apellido}">
+                                Eliminar
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+
+            cantidadProfesores.textContent = String(profesores.length);
+            actualizarEstadoProfesores('Profesores cargados correctamente.', 'success');
+            ajustarAlturaIframe();
+        }
+
+        async function obtenerProfesoresDesdeEndpoint(url) {
+            if (url.startsWith('/api/') && typeof fetchWithAuth === 'function') {
+                return fetchWithAuth(url);
+            }
+
+            return fetch(url);
+        }
+
+        async function cargarProfesores() {
+            tablaProfesores.innerHTML = `
+                <tr>
+                    <td colspan="5" class="px-4 py-6 text-center text-sm text-gray-500">
+                        Cargando listado...
+                    </td>
+                </tr>
+            `;
+            cantidadProfesores.textContent = '--';
+            actualizarEstadoProfesores('Consultando profesores...', 'info');
+
+            let ultimoError = null;
+
+            for (const endpoint of PROFESORES_ENDPOINTS) {
+                try {
+                    const response = await obtenerProfesoresDesdeEndpoint(endpoint);
+
+                    if (!response.ok) {
+                        throw new Error(`Respuesta ${response.status} en ${endpoint}`);
+                    }
+
+                    const profesores = await response.json();
+                    renderizarProfesores(profesores);
+                    return;
+                } catch (error) {
+                    ultimoError = error;
+                }
+            }
+
+            tablaProfesores.innerHTML = `
+                <tr>
+                    <td colspan="5" class="px-4 py-6 text-center text-sm text-blue-600">
+                        No se pudo cargar el listado de profesores.
+                    </td>
+                </tr>
+            `;
+            cantidadProfesores.textContent = '0';
+            actualizarEstadoProfesores(`Error al obtener profesores: ${ultimoError?.message || 'sin detalle'}.`, 'error');
+            ajustarAlturaIframe();
+        }
+
+        async function descargarArchivoProfesores({
+            endpoint,
+            button,
+            loadingMessage,
+            successMessage,
+            errorPrefix,
+            fallbackFileName
+        }) {
+            alternarEstadoBoton(button, true);
+            actualizarEstadoProfesores(loadingMessage, 'info');
+
+            try {
+                const response = await fetchWithAuth(endpoint);
+
+                if (!response.ok) {
+                    throw new Error(`Respuesta ${response.status}`);
+                }
+
+                const archivo = await response.blob();
+                const urlTemporal = URL.createObjectURL(archivo);
+                const link = document.createElement('a');
+                link.href = urlTemporal;
+                link.download = obtenerNombreArchivoDesdeHeaders(response, fallbackFileName);
+                document.body.appendChild(link);
+                link.click();
+                link.remove();
+                URL.revokeObjectURL(urlTemporal);
+
+                actualizarEstadoProfesores(successMessage, 'success');
+            } catch (error) {
+                actualizarEstadoProfesores(`${errorPrefix}: ${error.message}`, 'error');
+            } finally {
+                alternarEstadoBoton(button, false);
+            }
+        }
+
+        async function exportarProfesores() {
+            return descargarArchivoProfesores({
+                endpoint: '/api/profesores/export',
+                button: botonExportarProfesores,
+                loadingMessage: 'Preparando archivo de profesores...',
+                successMessage: 'Exportacion completada correctamente.',
+                errorPrefix: 'Error al exportar profesores',
+                fallbackFileName: 'profesores.xlsx'
+            });
+        }
+
+        async function descargarPlantillaProfesores() {
+            return descargarArchivoProfesores({
+                endpoint: '/api/profesores/plantilla',
+                button: botonDescargarPlantillaProfesores,
+                loadingMessage: 'Preparando plantilla de profesores...',
+                successMessage: 'Plantilla descargada correctamente.',
+                errorPrefix: 'Error al descargar la plantilla',
+                fallbackFileName: 'profesores_plantilla.xlsx'
+            });
+        }
+
+        async function importarProfesoresDesdeArchivo(file) {
+            if (!file) {
+                return;
+            }
+
+            if (!validarArchivoExcel(file)) {
+                actualizarEstadoProfesores('Seleccione un archivo Excel valido (.xlsx o .xls).', 'error');
+                inputImportarProfesores.value = '';
+                return;
+            }
+
+            alternarEstadoBoton(botonImportarProfesores, true);
+            inputImportarProfesores.disabled = true;
+            actualizarEstadoProfesores(`Preparando importacion de ${file.name}...`, 'info');
+
+            try {
+                let mensajeFinal = '';
+                let tipoFinal = 'success';
+
+                try {
+                    const resultado = await importarProfesoresDesdeEndpoint(file);
+                    const cantidad = Number(resultado?.count);
+                    const mensaje = typeof resultado?.message === 'string' && resultado.message.trim()
+                        ? resultado.message.trim()
+                        : 'Profesores importados correctamente.';
+
+                    mensajeFinal = Number.isFinite(cantidad)
+                        ? `${mensaje} Registros procesados: ${cantidad}.`
+                        : mensaje;
+                    tipoFinal = 'success';
+
+                    actualizarEstadoProfesores(
+                        Number.isFinite(cantidad)
+                            ? `${mensaje} Registros procesados: ${cantidad}.`
+                            : mensaje,
+                        'success'
+                    );
+                } catch (error) {
+                    if (error?.status && error.status < 500) {
+                        throw error;
+                    }
+
+                    console.warn('La importacion directa de profesores fallo. Se usara el fallback en frontend.', error);
+                    actualizarEstadoProfesores('La importacion directa no estuvo disponible. Procesando la planilla desde el navegador...', 'info');
+
+                    const { profesores, filasOmitidas } = await leerProfesoresDesdeExcel(file);
+                    const { creados, errores } = await importarProfesoresFilaPorFila(profesores);
+
+                    const mensajes = [];
+
+                    if (creados) {
+                        mensajes.push(`Se importaron ${creados} profesor${creados === 1 ? '' : 'es'}.`);
+                    }
+
+                    if (filasOmitidas.length) {
+                        mensajes.push(`Se omitieron las filas incompletas: ${filasOmitidas.join(', ')}.`);
+                    }
+
+                    if (errores.length) {
+                        const detalleErrores = errores.slice(0, 3).join('; ');
+                        mensajes.push(`Fallaron ${errores.length} fila${errores.length === 1 ? '' : 's'} (${detalleErrores}${errores.length > 3 ? '; ...' : ''}).`);
+                    }
+
+                    mensajeFinal = mensajes.join(' ') || 'No se encontraron filas validas para importar.';
+                    tipoFinal = errores.length ? (creados ? 'info' : 'error') : 'success';
+
+                    actualizarEstadoProfesores(
+                        mensajeFinal,
+                        tipoFinal
+                    );
+                }
+
+                await cargarProfesores();
+                if (mensajeFinal) {
+                    actualizarEstadoProfesores(mensajeFinal, tipoFinal);
+                }
+            } catch (error) {
+                actualizarEstadoProfesores(`Error al importar profesores: ${error.message}`, 'error');
+            } finally {
+                alternarEstadoBoton(botonImportarProfesores, false);
+                inputImportarProfesores.disabled = false;
+                inputImportarProfesores.value = '';
+            }
+        }
+
+        const modalProfesor = document.getElementById('modal-profesor');
+        const modalEditar = document.getElementById('modal-contenido-editar');
+        const modalEliminar = document.getElementById('modal-contenido-eliminar');
+        const modalTitulo = modalEditar.querySelector('h2');
+        const modalConfirmarEditar = document.getElementById('modal-confirmar-editar');
+        const inputNombre = document.getElementById('modal-nombre');
+        const inputApellido = document.getElementById('modal-apellido');
+        const mensajeEliminar = document.getElementById('modal-mensaje-eliminar');
+        let profesorActivoId = null;
+        let modalMode = null;
+
+        function abrirModal(mode, data = {}) {
+            profesorActivoId = data.id || null;
+            modalMode = mode;
+
+            if (mode === 'editar') {
+                modalEditar.classList.remove('hidden');
+                modalEliminar.classList.add('hidden');
+                modalTitulo.textContent = 'Editar profesor';
+                modalConfirmarEditar.textContent = 'Guardar';
+                inputNombre.value = data.nombre || '';
+                inputApellido.value = data.apellido || '';
+            } else if (mode === 'crear') {
+                modalEditar.classList.remove('hidden');
+                modalEliminar.classList.add('hidden');
+                modalTitulo.textContent = 'Agregar profesor';
+                modalConfirmarEditar.textContent = 'Crear';
+                inputNombre.value = '';
+                inputApellido.value = '';
+            } else if (mode === 'eliminar') {
+                modalEliminar.classList.remove('hidden');
+                modalEditar.classList.add('hidden');
+                mensajeEliminar.textContent = `¿Está seguro de que desea eliminar al profesor ${data.nombre || ''} ${data.apellido || ''}?`;
+            }
+            modalProfesor.classList.remove('hidden');
+        }
+
+        modalProfesor.addEventListener('click', (e) => {
+            if (e.target === modalProfesor) {
+                cerrarModal();
+            }
+        });
+
+        function cerrarModal() {
+            modalProfesor.classList.add('hidden');
+            profesorActivoId = null;
+            inputNombre.value = '';
+            inputApellido.value = '';
+        }
+
+        document.getElementById('modal-cancelar').addEventListener('click', cerrarModal);
+        document.getElementById('modal-cancelar-eliminar').addEventListener('click', cerrarModal);
+
+        document.getElementById('modal-confirmar-editar').addEventListener('click', async () => {
+            const nombre = inputNombre.value.trim();
+            const apellido = inputApellido.value.trim();
+            if (!nombre || !apellido) {
+                actualizarEstadoProfesores('Debe completar nombre y apellido', 'error');
+                return;
+            }
+
+            try {
+                let response;
+                if (modalMode === 'crear') {
+                    response = await fetchWithAuth('/api/profesores', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ nombre, apellido })
+                    });
+                } else if (modalMode === 'editar') {
+                    if (!profesorActivoId) return;
+                    response = await fetchWithAuth(`/api/profesores/${profesorActivoId}`, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ nombre, apellido })
+                    });
+                }
+
+                if (response && response.ok) {
+                    actualizarEstadoProfesores(modalMode === 'crear' ? 'Profesor creado correctamente.' : 'Profesor actualizado correctamente.', 'success');
+                    cerrarModal();
+                    cargarProfesores();
+                } else {
+                    throw new Error(`Error al ${modalMode === 'crear' ? 'crear' : 'actualizar'} profesor`);
+                }
+            } catch (error) {
+                actualizarEstadoProfesores(`Error: ${error.message}`, 'error');
+            }
+        });
+
+        document.getElementById('modal-confirmar-eliminar').addEventListener('click', async () => {
+            if (!profesorActivoId) return;
+            try {
+                const response = await fetchWithAuth(`/api/profesores/${profesorActivoId}`, {
+                    method: 'DELETE'
+                });
+                if (response.ok) {
+                    actualizarEstadoProfesores('Profesor eliminado correctamente.', 'success');
+                    cerrarModal();
+                    cargarProfesores();
+                } else {
+                    throw new Error('Error al eliminar profesor');
+                }
+            } catch (error) {
+                actualizarEstadoProfesores(`Error: ${error.message}`, 'error');
+            }
+        });
+
+        document.getElementById('crear-profesor').addEventListener('click', () => {
+            abrirModal('crear');
+        });
+
+        botonImportarProfesores.addEventListener('click', () => {
+            inputImportarProfesores.click();
+        });
+
+        inputImportarProfesores.addEventListener('change', async (event) => {
+            const [file] = event.target.files || [];
+            await importarProfesoresDesdeArchivo(file);
+        });
+
+        botonDescargarPlantillaProfesores.addEventListener('click', descargarPlantillaProfesores);
+        botonExportarProfesores.addEventListener('click', exportarProfesores);
+
+        document.addEventListener('click', (e) => {
+            if (e.target.classList.contains('editar-profesor')) {
+                abrirModal('editar', {
+                    id: e.target.dataset.id,
+                    nombre: e.target.dataset.nombre,
+                    apellido: e.target.dataset.apellido
+                });
+            } else if (e.target.classList.contains('eliminar-profesor')) {
+                abrirModal('eliminar', {
+                    id: e.target.dataset.id,
+                    nombre: e.target.dataset.nombre,
+                    apellido: e.target.dataset.apellido
+                });
+            }
+        });
+
+        async function editarProfesor(id) {
+            abrirModal('editar', { id });
+        }
+
+        async function eliminarProfesor(id) {
+            abrirModal('eliminar', { id });
+        }
+
+        document.addEventListener('DOMContentLoaded', cargarProfesores);
+    </script>
+</body>
+
+</html>

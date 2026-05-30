@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Profile</title>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css">
+<link rel="stylesheet" href="/assets/css/base.css">
+  <link href="/css/output.css" rel="stylesheet">
+
+</head>
+
+<body class="bg-gray-50">
+
+<main class="p-6">
+<div class="flex items-center gap-3 mb-6">
+  <h1 class="text-3xl font-bold text-gray-800">
+    Información Personal # ID: <span id="idUsuario"></span>
+  </h1>
+
+  
+</div>
+
+    <!-- TARJETA -->
+    <div class="bg-white border border-gray-200 rounded-2xl p-8 shadow-sm">
+
+      <!-- NOMBRE GRANDE -->
+      <div class="mb-8">
+        <h2 class="text-3xl text-gray-900" >Nombre <span id="nombre" class="text-3xl font-bold text-gray-900"></span> </h2>
+        <p id="apellido" class="text-xl text-gray-600"></p>
+      </div>
+
+      <!-- INFORMACIÓN -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+        <div>
+          <p class="text-xs text-gray-500 mb-1">Email</p>
+          <p id="profile-email" class="text-sm font-medium text-gray-800"></p>
+        </div>
+
+        <div>
+          <p class="text-xs text-gray-500 mb-1">DNI</p>
+          <p id="dni" class="text-sm font-medium text-gray-800"></p>
+        </div>
+
+        <div>
+          <p class="text-xs text-gray-500 mb-1">Rol</p>
+          <p id="rol" class="text-sm font-medium text-gray-800"></p>
+        </div>
+
+        <div>
+          <p class="text-xs text-gray-500 mb-1">Grupo</p>
+          <p id="grupo" class="text-sm font-medium text-gray-800"></p>
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+</main>
+
+<script src="/services/api.js"></script>
+<script src="/assets/js/js/profile.js"></script>
+
+</body>
+</html>

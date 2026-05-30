@@ -1,0 +1,259 @@
+<!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css"> -->
+<link rel="stylesheet" href="/assets/css/base.css">
+  <link href="assets/css/output.css" rel="stylesheet">
+  <link href="/css/output.css" rel="stylesheet">
+
+
+</head>
+<body>
+
+    <!-- Sprite oculto -->
+    <div id="svg-sprite" style="display:none"></div>
+
+    <div class="space-y-6">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+           
+            <div class="rounded-lg border bg-card text-card-foreground shadow-sm hover:shadow-lg transition-shadow">
+                <div class="p-6">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm font-medium text-gray-600">Total Alumnos</p>
+                            <p id="total-alumnos" class="text-3xl font-bold text-gray-900">...</p>
+                        </div>
+                        <div class="bg-blue-500 p-3 rounded-full">
+                            <svg class="superIcono rojo">
+                                    <use xlink:href="#user-outline"></use>
+                                </svg>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="rounded-lg border bg-card text-card-foreground shadow-sm hover:shadow-lg transition-shadow">
+                <div class="p-6">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm font-medium text-gray-600">Cursos Activos</p>
+                            <p id="cursos-activos" class="text-3xl font-bold text-gray-900">...</p>
+                        </div>
+                        <div class="bg-green-500 p-3 rounded-full">
+                            <svg class="superIcono rojo">
+                                <use xlink:href="#book-open-outline"></use>
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="rounded-lg border bg-card text-card-foreground shadow-sm hover:shadow-lg transition-shadow">
+                <div class="p-6">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm font-medium text-gray-600">Egresados</p>
+                            <p class="text-3xl font-bold text-gray-900">856</p>
+                        </div>
+                        <div class="bg-purple-500 p-3 rounded-full">
+                            <svg class="superIcono rojo">
+                                <use xlink:href="#graduation-cap-outline"></use>
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="rounded-lg border bg-card text-card-foreground shadow-sm hover:shadow-lg transition-shadow">
+                <div class="p-6">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm font-medium text-gray-600">Promedio General</p>
+                            <p class="text-3xl font-bold text-gray-900">7.8</p>
+                        </div>
+                        <div class="bg-yellow-500 p-3 rounded-full">
+                            <svg class="superIcono rojo">
+                                <use xlink:href="#star-outline"></use>
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <!-- Actividad Reciente DINÁMICA -->
+            <div class="rounded-lg border bg-card text-card-foreground shadow-sm">
+                <div class="flex flex-col space-y-1.5 p-6">
+                    <h3 class="text-2xl font-semibold leading-none tracking-tight">Actividad Reciente</h3>
+                </div>
+                <div class="p-6 pt-0">
+                    <div class="space-y-4" id="actividad-reciente">
+                      
+                    </div>
+                </div>
+            </div>
+            <!-- Accesos Rápidos -->
+            <div class="rounded-lg border bg-card text-card-foreground shadow-sm">
+                <div class="flex flex-col space-y-1.5 p-6">
+                    <h3 class="text-2xl font-semibold leading-none tracking-tight">Accesos Rápidos</h3>
+                </div>
+                <div class="p-6 pt-0">
+                    <div class="grid grid-cols-2 gap-4">
+                        <!-- Botón Inscribir Alumno -->
+                        <button class="p-4 text-left rounded-lg border border-gray-200 hover:border-blue-300 hover:bg-blue-50 transition-colors">
+                            <svg class="icono rojo">
+                                <use xlink:href="#user-plus-outline"></use>
+                            </svg>
+                            <h3 class="font-semibold text-gray-900">Inscribir Alumno</h3>
+                            <p class="text-sm text-gray-600">Registrar nuevo estudiante</p>
+                        </button>
+                        <!-- Botón Crear Curso -->
+                        <button class="p-4 text-left rounded-lg border border-gray-200 hover:border-green-300 hover:bg-green-50 transition-colors">
+                            <svg class="icono rojo">
+                                <use xlink:href="#book-open-outline"></use>
+                            </svg>
+                            <h3 class="font-semibold text-gray-900">Crear Curso</h3>
+                            <p class="text-sm text-gray-600">Nuevo curso académico</p>
+                        </button>
+                        <!-- Botón Cargar Notas -->
+                        <button class="p-4 text-left rounded-lg border border-gray-200 hover:border-purple-300 hover:bg-purple-50 transition-colors">
+                            <svg class="icono rojo">
+                                <use xlink:href="#graduation-cap-outline"></use>
+                            </svg>
+                            <h3 class="font-semibold text-gray-900">Cargar Notas</h3>
+                            <p class="text-sm text-gray-600">Registrar calificaciones</p>
+                        </button>
+                        <!-- Botón Generar Pase -->
+                        <button class="p-4 text-left rounded-lg border border-gray-200 hover:border-orange-300 hover:bg-orange-50 transition-colors">
+                            <svg class="icono rojo">
+                                <use xlink:href="#arrow-roundsquare"></use>
+                            </svg>
+                            <h3 class="font-semibold text-gray-900">Generar Pase</h3>
+                            <p class="text-sm text-gray-600">Documentación de transferencia</p>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+   
+    <script src="/services/api.js"></script>
+    <script>
+  async function cargarActividadReciente() {
+    const contenedor = document.getElementById('actividad-reciente');
+    if (!contenedor) return;
+
+    const token = localStorage.getItem('token');
+
+    if (!token) {
+        contenedor.innerHTML = `
+            <p class="text-sm text-red-500">
+                No autenticado. Inicie sesión nuevamente.
+            </p>
+        `;
+        return;
+    }
+
+    try {
+        const response = await fetchWithAuth('/logs/ultimos', {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+
+        if (!response.ok) {
+            if (response.status === 401) {
+                localStorage.removeItem('token');
+                contenedor.innerHTML = `
+                    <p class="text-sm text-red-500">
+                        Sesión expirada.
+                    </p>
+                `;
+                return;
+            }
+            throw new Error('Error al obtener logs');
+        }
+
+        const logs = await response.json();
+
+        if (!logs.length) {
+            contenedor.innerHTML = `
+                <p class="text-sm text-gray-500">
+                    No hay actividad reciente.
+                </p>
+            `;
+            return;
+        }
+
+        contenedor.innerHTML = logs.map(log => `
+            <div class="flex items-center space-x-4 p-3 rounded-lg hover:bg-gray-50">
+                <div class="bg-blue-100 p-2 rounded-full">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                        viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                        class="lucide lucide-calendar h-4 w-4 text-blue-600">
+                        <path d="M8 2v4"></path>
+                        <path d="M16 2v4"></path>
+                        <rect width="18" height="18" x="3" y="4" rx="2"></rect>
+                        <path d="M3 10h18"></path>
+                    </svg>
+                </div>
+                <div class="flex-1">
+                    <p class="text-sm font-medium text-gray-900">
+                        ${log.detalle || 'Actividad registrada'}
+                    </p>
+                    <p class="text-sm text-gray-600">
+                        ${log.usuario || 'Sistema'} (${log.accion || 'N/A'})
+                    </p>
+                </div>
+                <span class="text-xs text-gray-400">
+                    ${tiempoAgo(log.fecha)}
+                </span>
+            </div>
+        `).join('');
+
+    } catch (error) {
+        console.error(error);
+        contenedor.innerHTML = `
+            <p class="text-sm text-red-500">
+                Error al cargar la actividad.
+            </p>
+        `;
+    }
+}
+    function tiempoAgo(fecha) {
+        const ahora = new Date();
+        const f = new Date(fecha);
+        const diffMs = ahora - f;
+        const diffMin = Math.floor(diffMs / 60000);
+        if (diffMin < 60) return `Hace ${diffMin} min`;
+        const diffH = Math.floor(diffMin / 60);
+        if (diffH < 24) return `Hace ${diffH} horas`;
+        const diffD = Math.floor(diffH / 24);
+        return `Hace ${diffD} días`;
+    }
+    window.addEventListener('DOMContentLoaded', cargarActividadReciente);
+    </script>
+    <script src="/assets/js/js/pageAccess.js"></script>
+    <script>
+        //Cargar iconos
+        fetch('/assets/icons/iconos.svg')
+        .then(res => res.text())
+        .then(data => {
+            document.getElementById('svg-sprite').innerHTML = data;
+        });
+
+        async function cargarDatosInicio() {
+            try {
+                const response = await fetchWithAuth('frontend/inicio');
+                if (!response.ok) throw new Error('Error al cargar datos de inicio');
+                const data = await response.json();
+                console.log('Datos de inicio:', data);
+            document.getElementById('cursos-activos').textContent = data.totalCursos;
+            document.getElementById('total-alumnos').textContent = data.totalAlumnos;
+
+                
+            } catch (error) {
+                console.error(error);
+            }
+        }
+    window.addEventListener('DOMContentLoaded', cargarDatosInicio);
+
+    </script>
+</body>
+</html>

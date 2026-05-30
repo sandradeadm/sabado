@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Home | ABM Alumnos</title>
+  <link rel="icon" href="/assets/img/Logo.png" type="image/png">
+  <link rel="stylesheet" href="/assets/css/base.css">
+  <link href="assets/css/output.css" rel="stylesheet">
+ 
+
+<body>
+
+  <!-- Sprite oculto -->
+  <div id="svg-sprite" style="display:none"></div>
+
+  <!-- Div donde se mostrarán los iconos -->
+  <div id="icon-container"></div>
+
+  <div class="min-h-screen bg-gray-50">
+    <!--  Header  -->
+    <header class="bg-gradient-to-r from-blue-600 to-blue-800 text-white shadow-lg w-full">
+      <div class="w-full px-6 py-4">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center space-x-4">
+            <div class="bg-white/20 p-2 rounded-lg">
+              <svg class="superIcono rojo">
+                <use xlink:href="#user-outline"></use>
+              </svg>
+            </div>
+            <div>
+              <h1 class="text-2xl font-bold">E.E.S.T N°4</h1>
+              <p class="text-blue-100 text-sm">
+                Sistema de Administración de Alumnos
+              </p>
+            </div>
+          </div>
+          <a onclick="cargarVista('perfil.html')" class="cursor-pointer">
+          <div class="flex items-center space-x-4">
+            <div class="flex items-center space-x-2 bg-white/10 px-3 py-2 rounded-lg">
+              <svg class="icono rojo">
+                <use xlink:href="#user-outline"></use>
+              </svg>
+              <span class="text-sm" id="saludoUsuario">Hola, sdasd</span>
+            </div>
+            </a>
+
+            
+
+            <button id="cerrarSesion"
+              class="inline-flex items-center px-4 py-2 bg-red-600 transition ease-in-out delay-75 hover:bg-red-700 text-white text-sm font-medium rounded-md hover:-translate-y-1 hover:scale-110">
+              <svg stroke="currentColor" viewBox="0 0 24 24" fill="none" class="h-5 w-5 mr-2"
+                xmlns="http://www.w3.org/2000/svg">
+
+                <use xlink:href="#logout"></use>
+              </svg>
+
+              Cerrar sesión
+            </button>
+
+
+          </div>
+
+        </div>
+    </header>
+
+
+    <!-- Nav -->
+    <nav class="bg-blue-700 border-b border-blue-600 w-full">
+      <div class="w-full px-4">
+        <div class="flex space-x-1 overflow-x-auto py-2">
+
+          <a onclick="cargarVista('inicio.html')"
+            class="flex h-10 items-center gap-2 whitespace-nowrap px-4 py-2 text-sm font-medium rounded-md text-blue-100 hover:bg-blue-600 hover:text-white">
+            <svg class="icono rojo">
+              <use xlink:href="#home-outline"></use>
+            </svg>
+            <span>Inicio</span>
+          </a>
+
+          <a onclick="cargarVista('ofiAlumnos.html')"
+            class="flex h-10 items-center gap-2 whitespace-nowrap px-4 py-2 text-sm font-medium rounded-md text-blue-100 hover:bg-blue-600 hover:text-white">
+            <svg class="icono rojo">
+              <use xlink:href="#briefcase-outline"></use>
+            </svg>
+            <span>Manager de Alumnos</span>
+          </a>
+
+          <a onclick="cargarVista('cursos/cursos_general.html')"
+            class="flex h-10 items-center gap-2 whitespace-nowrap px-4 py-2 text-sm font-medium rounded-md text-blue-100 hover:bg-blue-600 hover:text-white">
+            <svg class="icono rojo">
+              <use xlink:href="#book-open-outline"></use>
+            </svg>
+            <span>Gestión cursos</span>
+          </a>
+
+          <a onclick="cargarVista('gestionAcademica/general.html')"
+            class="flex h-10 items-center gap-2 whitespace-nowrap px-4 py-2 text-sm font-medium rounded-md text-blue-100 hover:bg-blue-600 hover:text-white">
+            <svg class="icono rojo">
+              <use xlink:href="#graduation-cap-outline"></use>
+            </svg>
+            <span>Gestión Académica</span>
+          </a>
+
+          <a onclick="cargarVista('gestionUsuarios.html')"
+            class="flex h-10 items-center gap-2 whitespace-nowrap px-4 py-2 text-sm font-medium rounded-md text-blue-100 hover:bg-blue-600 hover:text-white">
+            <svg class="icono rojo">
+              <use xlink:href="#user-group-outline"></use>
+            </svg>
+            <span>Administración de Usuarios</span>
+          </a>
+
+          <a onclick="cargarVista('bitacora.html')"
+            class="flex h-10 items-center gap-2 whitespace-nowrap px-4 py-2 text-sm font-medium rounded-md text-blue-100 hover:bg-blue-600 hover:text-white">
+            <svg class="icono rojo">
+              <use xlink:href="#comand-line-outline"></use>
+            </svg>
+            <span>Bitácora</span>
+          </a>
+
+          <a onclick="cargarVista('config.html')"
+            class="flex h-10 items-center gap-2 whitespace-nowrap px-4 py-2 text-sm font-medium rounded-md text-blue-100 hover:bg-blue-600 hover:text-white">
+            <svg class="icono rojo">
+              <use xlink:href="#config-outline"></use>
+            </svg>
+            <span>Configuración</span>
+          </a>
+
+        </div>
+      </div>
+    </nav>
+
+
+
+    <main class="flex-grow flex flex-col">
+      <iframe class="frame" id="contenido" src="views/inicio.html" frameborder="0"></iframe>
+    </main>
+
+    <div class="rounded-lg border bg-card text-card-foreground shadow-sm">
+      <div class="p-6">
+        <div class="text-center bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-lg p-6">
+          <h2 class="text-2xl font-bold mb-2">Escuela Técnica N° 4 Prof. Ricardo A. López</h2>
+          <p class="text-blue-100">Sistema Integral de Gestión Académica</p>
+          <div class="mt-4 grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+            <div><strong>Ubicación:</strong> [Dirección de la escuela]</div>
+            <div><strong>Desarrollado por:</strong> Equipo de Desarrollo</div>
+            <div><strong>Versión:</strong> 2.0.1</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <script src="/services/api.js"></script>
+  <script src="/assets/js/ui.js"></script>
+  <script src="/assets/js/js/pageProtection.js"></script>
+  <script src="/assets/js/js/auto-logout.js"></script>
+  
+
+
+</body>
+
+</html>

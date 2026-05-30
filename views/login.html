@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login | E.E.S.T N°4</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="/assets/css/base.css">
+  <link href="/css/output.css" rel="stylesheet">
+
+</head>
+
+<body class="bg-gray-50 min-h-screen flex flex-col">
+
+    <!-- Sprite oculto -->
+    <div id="svg-sprite" style="display:none"></div>
+
+    <header class="bg-gradient-to-r from-blue-600 to-blue-800 text-white shadow-lg">
+        <div class="container mx-auto px-4 py-4 flex items-center space-x-4">
+            <div class="bg-white/20 p-2 rounded-lg">
+                <svg class="superDuperIcono rojo mx-auto">
+                    <use xlink:href="#random"></use>
+                </svg>
+            </div>
+            <div>
+                <h1 class="text-2xl font-bold">E.E.S.T N°4</h1>
+                <p class="text-blue-100 text-sm">Sistema de Administración de Alumnos</p>
+            </div>
+        </div>
+    </header>
+
+    <main class="flex-grow flex items-center justify-center">
+        <form id="loginForm" class="bg-white rounded-lg shadow-md p-8 w-full max-w-md border space-y-6">
+            <h2 class="text-2xl font-bold text-gray-900 text-center mb-4 flex items-center justify-center">
+
+                Iniciar Sesión
+            </h2>
+            <div>
+                <label for="usuario" class="block mb-2 font-semibold text-gray-700">Usuario (Nombre o DNI)</label>
+                <input type="text" id="usuario" name="usuario"
+                    class="border px-3 py-2 rounded w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    required>
+            </div>
+            <div class="relative">
+                <label for="password" class="block mb-2 font-semibold text-gray-700">Contraseña</label>
+                <input type="password" id="password" name="password"
+                    class="border px-3 py-2 rounded w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    required>
+                <button type="button" id="togglePassword"
+                    class="absolute right-3 top-8 text-gray-500 hover:text-gray-700 focus:outline-none">
+                    <svg class="icono rojo mx-auto">
+                        <use xlink:href="#eye-outline"></use>
+                    </svg>
+                </button>
+            </div>
+            <div id="loginMsg" class="text-center text-red-600 font-semibold"></div>
+            <button type="submit"
+                class="w-full bg-blue-700 text-white py-2 rounded font-bold hover:bg-blue-800 transition">Ingresar</button>
+        </form>
+        <!-- MODAL CAMBIO DE CONTRASEÑA -->
+        <div id="modalCambioPassword" class="fixed z-50 inset-0 flex items-center justify-center bg-black bg-opacity-50"
+            style="display:none;">
+            <div class="bg-white rounded-lg p-6 w-full max-w-xs shadow-lg">
+                <h2 class="text-lg font-bold text-center mb-4">Cambiar contraseña</h2>
+                <form id="formCambioPassword">
+                    <input type="password" id="inputNuevaPassword" class="w-full border px-3 py-2 rounded mb-4" required
+                        placeholder="Nueva contraseña">
+                    <input type="password" id="inputRepetirPassword" class="w-full border px-3 py-2 rounded mb-4"
+                        required placeholder="Repetir contraseña">
+                    <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded w-full">Cambiar</button>
+                    <button type="button" class="mt-2 text-gray-500 hover:text-gray-800 w-full"
+                        onclick="cerrarModalCambioPassword()">Cancelar</button>
+                </form>
+                <div id="msgCambioPassword" class="text-center text-red-600 font-semibold mt-2"></div>
+            </div>
+        </div>
+        <script src="/services/api.js"></script>
+        <script src="/assets/js/js/login.js"></script>
+        <script src="/assets/js/js/loginPasswordToggle.js"></script>
+        <script src="/assets/js/js/loginPasswordChange.js"></script>
+        <script>
+            //Cargar iconos
+            fetch('/assets/icons/iconos.svg')
+                .then(res => res.text())
+                .then(data => {
+                    document.getElementById('svg-sprite').innerHTML = data;
+                });
+        </script>
+</body>
+
+</html>

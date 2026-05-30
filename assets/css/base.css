@@ -1,0 +1,31 @@
+/* ===== Contenido principal (iframe) ===== */
+
+
+
+.icono{
+  width: 24px;
+  height: 24px;
+  fill: currentColor;
+}
+
+/* .rojo{
+  color: red;
+} */
+
+.superIcono{
+  width: 32px;
+  height: 32px;
+  fill: currentColor;
+}
+
+.miniIcono{
+  width: 18px;
+  height: 18px;
+  fill: currentColor;
+}
+
+.superDuperIcono{
+  width: 50px;
+  height: 50px;
+  fill: currentColor;
+}

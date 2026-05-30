@@ -1,0 +1,61 @@
+    Proyecto
+    ├── assets/
+    |   └── css/
+    |       └── base.css
+    |       ├── bienvenida.css
+    |       ├── btn.css
+    |       ├── login.css
+    |       ├── matriz.css
+    |       ├── modal.css
+    |       └── tablas.css
+    │   └── icons/
+    │   └── img/
+    |       └── logo.png
+    │   └── js/
+    |       └── controllers/
+    |           └── alumnos.js
+    |           └── materias.js
+    |       ├── filtros.js
+    |       ├── matriz.js
+    |       ├── modal.js
+    |       └── ui.js
+    ├── node_modues/
+    ├── routes/
+    |      └── alumnos.js
+    |      ├── cursos.js
+    |      ├── logs.js
+    |      ├── materias.js
+    |      ├── pagination.js
+    |      ├── planes.js
+    |      ├── tutores.js
+    |      └── usuarios.js
+    ├── usuarios/
+    |       └── usuarios.routes.js
+    |       ├── usuarios.middleware.js
+    |       ├── usuarios.repository.js
+    |       ├── usuarios.services.js
+    |       ├── usuarios.controller.js
+    |       └── validator.js 
+    ├── alumnos/
+    |       └── alumnos.routes.js
+    |       ├── alumnos.middleware.js
+    |       ├── alumnos.repository.js
+    |       ├── alumnos.services.js
+    |       └── alumnos.controller.js
+    ├── views/
+    |       └── alumnos.html
+    |       ├── bienvenica.html
+    |       ├── cursos.html
+    |       ├── log.html
+    |       ├── login.html
+    |       ├── materias.html
+    |       ├── planes.html
+    |       ├── roles.html
+    |       ├── tutores.html
+    |       └── usuarios.html
+    ├── .env
+    ├── app.js
+    ├── db.js
+    ├── index.html
+    ├── package-lock,json
+    ├── package.json

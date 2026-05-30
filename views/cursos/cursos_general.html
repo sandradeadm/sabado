@@ -1,0 +1,277 @@
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <!-- tailwind -->
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/assets/css/modal1.css">
+    <link rel="stylesheet" href="/assets/css/base.css">
+    <link rel="stylesheet" href="/assets/css/btn.css">
+  <link href="/css/output.css" rel="stylesheet">
+
+
+</head>
+
+<body>
+
+    <!-- Sprite oculto -->
+    <div id="svg-sprite" style="display:none"></div>
+
+    <div class="min-h-screen bg-gray-50">
+        <div class="space-y-6">
+            <div class="bg-white rounded-lg shadow-sm border p-6">
+                <h1 class="text-2xl font-bold text-gray-900 mb-2">Gestión de Cursos</h1>
+                <p class="text-gray-600">Creación de cursos, asignación de alumnos y gestión de cupos
+                    disponibles.</p>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+                <div
+                    class="rounded-lg border bg-card text-card-foreground shadow-sm hover:shadow-md transition-shadow cursor-pointer">
+                    <div class="p-6 text-center">
+                        <button onclick="mostrarModal(document.getElementById('modalCrearCurso'))" class="w-full">
+                        <svg class="superDuperIcono rojo mx-auto">
+                            <use xlink:href="#plus"></use>
+                        </svg>
+                        <h3 class="font-semibold text-gray-900 mb-2">Crear Curso</h3>
+                        <p class="text-sm text-gray-600">Nuevo curso vinculado a plan de estudios</p>
+                    </div>
+                </div>
+                <div
+                    class="rounded-lg border bg-card text-card-foreground shadow-sm hover:shadow-md transition-shadow cursor-pointer">
+                    <div class="p-6 text-center">
+                        <button onclick="mostrarModal(document.getElementById('buscadorCurso'))" class="w-full">
+                        <svg class="superDuperIcono rojo mx-auto">
+                            <use xlink:href="#search"></use>
+                        </svg>
+                        <h3 class="font-semibold text-gray-900 mb-2">Ver curso especifico</h3>
+                        <p class="text-sm text-gray-600">Listar alumnos de un curso</p>
+                        </button>
+                    </div>
+                </div>
+                <div
+                    class="rounded-lg border bg-card text-card-foreground shadow-sm hover:shadow-md transition-shadow cursor-pointer">
+                    <div class="p-6 text-center">
+                        <svg class="superDuperIcono rojo mx-auto">
+                            <use xlink:href="#users-outline"></use>
+                        </svg>
+                        <h3 class="font-semibold text-gray-900 mb-2">Asignar Alumnos</h3>
+                        <p class="text-sm text-gray-600">Vincular estudiantes según cupos</p>
+                    </div>
+                </div>
+                <div
+                    class="rounded-lg border bg-card text-card-foreground shadow-sm hover:shadow-md transition-shadow cursor-pointer">
+                    <div class="p-6 text-center">
+                        <svg class="superDuperIcono rojo mx-auto">
+                            <use xlink:href="#random"></use>
+                        </svg>
+                        <h3 class="font-semibold text-gray-900 mb-2">Sorteo Automático</h3>
+                        <p class="text-sm text-gray-600">Cuando no hay cupos disponibles</p>
+                    </div>
+                </div>
+            </div>
+          
+    </div>
+     <div class="rounded-lg border bg-card text-card-foreground shadow-sm w-full">
+                <div class="flex flex-col space-y-1.5 p-6">
+                    <h3 class="tracking-tight text-lg font-semibold text-gray-800">Lista de cursos</h3>
+                </div>
+                <div class="p-6 pt-0">
+                    <div class="overflow-x-auto">
+                       <table id="tabla-cursos" class="w-full table-auto">
+                           <thead>
+                               <tr class="bg-gradient-to-r from-blue-600 to-blue-700 text-white cursor-default">
+                                 <th class="px-4 py-3 text-left font-medium">ID</th>
+                                 <th class="px-4 py-3 text-left font-medium">Año</th>
+                                 <th class="px-4 py-3 text-left font-medium">Division</th>
+                                 <th class="px-4 py-3 text-left font-medium">Nombre del plan</th>
+                                 <th class="px-4 py-3 text-left font-medium">Año lectivo</th>
+                                 <th class="px-4 py-3 text-center font-medium">Acciones</th>
+                               </tr>
+                            </thead>
+                            <tbody class="divide-y divide-gray-200">
+                                <!-- Aquí se cargan los cursos desde cursos.js -->
+                              </tbody>
+                            </table>
+                    </div>
+                </div>
+            </div>
+
+
+     <!-- modal para buscar alumno -->
+  <div id="buscadorCurso" class="modal">
+   <div class="modal-content">
+    <div class="container-inscripcion">
+        <span class="close-btn" onclick="cerrarModalPorId('buscadorCurso')">&times;</span>
+      <h2>Buscar Curso especifico</h2>
+        <div class="grid-campos">
+  <input type="number" id="inputAnio" maxlength="4" placeholder="Ingrese año lectivo">
+
+  <select id="selectCursoAnio">
+    <option value="">Seleccione año</option>
+    <option value="1°">1°</option>
+    <option value="2°">2°</option>
+    <option value="3°">3°</option>
+    <option value="4°">4°</option>
+    <option value="5°">5°</option>
+    <option value="6°">6°</option>
+    <option value="7°">7°</option>
+  </select>
+
+  <select id="selectCursoDivision">
+   <option value="">Seleccione división</option>
+            <option value="1°">1°</option>
+            <option value="2°">2°</option>
+            <option value="3°">3°</option>
+            <option value="4°">4°</option>
+  </select>
+
+  <input type="hidden" id="inputCurso"> <!-- Este se llenará automáticamente -->
+  
+</div>
+     <div class="form-actions">
+        <button id="btnBuscarCurso">Buscar</button>
+    </div>
+    <div id="resultadosAlumnos" class="tabla-resultados"></div>
+</div>
+   </div>
+  </div>
+
+<div id="modalResultados" class="modal">
+  <div class="modal-content">
+        <div class="container-inscripcion">
+    <span class="close-btn" onclick="cerrarModalPorId('modalResultados')">&times;</span>
+    <h2>Resultados de la búsqueda</h2>
+
+    <div id="contenidoResultados"></div>
+      </div>
+
+  </div>
+</div>
+
+<!-- Modal detalle de curso -->
+<div id="modalDetalleCurso" class="modal">
+  <div class="modal-content">
+    <div class="container-inscripcion">
+      <span class="close-btn" onclick="cerrarModalPorId('modalDetalleCurso')">&times;</span>
+      <h2>Detalle del curso</h2>
+
+      <div id="cursoError" class="hidden mb-4 rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700">
+        No se pudo cargar el curso.
+      </div>
+
+      <div id="cursoSkeleton" class="animate-pulse space-y-6">
+        <div class="bg-white shadow rounded-xl p-6 space-y-3">
+          <div class="h-6 w-1/3 rounded bg-gray-200"></div>
+          <div class="h-4 w-1/4 rounded bg-gray-200"></div>
+          <div class="pt-2 space-y-2">
+            <div class="h-4 w-1/5 rounded bg-gray-200"></div>
+            <div class="h-5 w-1/4 rounded bg-gray-200"></div>
+            <div class="h-4 w-2/3 rounded bg-gray-200"></div>
+          </div>
+        </div>
+        <div class="space-y-3">
+          <div class="h-5 w-32 rounded bg-gray-200"></div>
+          <div class="grid md:grid-cols-2 gap-4">
+            <div class="h-24 rounded-lg bg-gray-200"></div>
+            <div class="h-24 rounded-lg bg-gray-200"></div>
+            <div class="h-24 rounded-lg bg-gray-200"></div>
+            <div class="h-24 rounded-lg bg-gray-200"></div>
+          </div>
+        </div>
+      </div>
+
+      <div id="cursoContenido" class="hidden">
+        <div class="max-w-5xl mx-auto p-6 space-y-6">
+          <div class="bg-white shadow rounded-xl p-6">
+            <h1 class="text-2xl font-bold" id="cursoTitulo"></h1>
+            <p class="text-gray-500 mt-1" id="anioLectivo"></p>
+
+            <div class="mt-4">
+              <p class="font-semibold text-gray-700">Plan de estudio</p>
+              <p id="nombrePlan" class="text-lg"></p>
+              <p id="descripcionPlan" class="text-gray-600 text-sm"></p>
+            </div>
+          </div>
+
+          <div>
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
+              <h2 class="text-xl font-semibold">Materias</h2>
+              <div class="flex items-center gap-2">
+                <label for="ordenMaterias" class="text-sm text-gray-600">Ordenar por</label>
+                <select id="ordenMaterias" class="border rounded-md px-2 py-1 text-sm">
+                  <option value="nombre">Alfabético</option>
+                  <option value="profesor">Profesor</option>
+                </select>
+              </div>
+            </div>
+
+            <p id="materiasEmpty" class="text-gray-500 hidden">Este curso todavía no tiene materias asignadas.</p>
+            <div id="listaMaterias" class="grid md:grid-cols-2 gap-4"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal -->
+<div id="modalCrearCurso" class="modal">
+  <div class="modal-content">
+    <div class="container-inscripcion">
+      <span class="close-btn" onclick="cerrarModalPorId('modalCrearCurso')">&times;</span>
+      <h2>Crear curso</h2>
+      <form id="formCurso">
+  <input type="hidden" name="id_curso" />
+  
+  <label>Año:</label>
+  <select name="anio" id="selectAnio" required>
+    <option value="">Seleccione año</option>
+    <option value="1°">1°</option>
+    <option value="2°">2°</option>
+    <option value="3°">3°</option>
+    <option value="4°">4°</option>
+    <option value="5°">5°</option>
+    <option value="6°">6°</option>
+    <option value="7°">7°</option>
+  </select>
+
+  <label>División:</label>
+  <select name="division" id="selectDivision" required>
+    <option value="">Seleccione división</option>
+    <option value="1°">1°</option>
+    <option value="2°">2°</option>
+    <option value="3°">3°</option>
+    <option value="4°">4°</option>
+  </select>
+
+  <label>Año lectivo:</label>
+  <input type="number" name="anio_lectivo" required>
+
+  <label>Plan de estudio:</label>
+  <select name="id_plan" id="selectPlanes" required>
+    <option value="">Seleccione un plan</option>
+  </select>
+
+  <button type="submit">Crear Curso</button>
+</form>
+    </div>
+  </div>
+</div>
+<script src="/services/api.js"></script>
+<script src="/assets/js/busquedamodal.js"></script>
+<script src="/assets/js/controllers/curso/cursos_general.js"></script>
+<script src="/assets/js/modal.js"></script>
+<script src="/assets/js/js/pageAccess.js"></script>
+  <script src="/assets/js/ui.js"></script>
+<script>
+    //Cargar iconos
+    fetch('/assets/icons/iconos.svg')
+    .then(res => res.text())
+    .then(data => {
+        document.getElementById('svg-sprite').innerHTML = data;
+    });
+</script>
+
+</body>
